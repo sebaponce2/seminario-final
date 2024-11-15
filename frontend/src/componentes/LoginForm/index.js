@@ -43,7 +43,7 @@ export const LoginForm = () => {
         </Link>
         <div className="text-center">
           <Link
-            to="/forgot-password"
+            to="/recoverPassword"
             className="text-sm text-gray-600 hover:text-gray-900"
           >
             Olvidé mi contraseña
