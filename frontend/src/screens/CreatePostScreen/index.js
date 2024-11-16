@@ -1,37 +1,65 @@
-import React, { useState, useEffect } from 'react'
-import { Trash2 } from 'lucide-react'
+import React, { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 const provinciasArgentina = [
-  'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes', 'Entre Ríos', 
-  'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 
-  'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 
-  'Tierra del Fuego', 'Tucumán'
-]
+  "Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucumán",
+];
 
-export const CreateProductScreen = () => {
-  const [imagenes, setImagenes] = useState([])
-  const [nombre, setNombre] = useState('')
-  const [descripcion, setDescripcion] = useState('')
-  const [provincia, setProvincia] = useState('')
+export const CreatePostScreen = () => {
+  const [imagenes, setImagenes] = useState([]);
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [provincia, setProvincia] = useState("");
+
+  const [searchParams] = useSearchParams();
+  const isService = searchParams.get("isService") === "true";
 
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files)
-    const newImages = files.map(file => URL.createObjectURL(file))
-    setImagenes(prev => [...prev, ...newImages].slice(0, 5))
-  }
+    const files = Array.from(e.target.files);
+    const newImages = files.map((file) => URL.createObjectURL(file));
+    setImagenes((prev) => [...prev, ...newImages].slice(0, 5));
+  };
 
   const handleDeleteImage = (index) => {
-    setImagenes(prev => prev.filter((_, i) => i !== index))
-  }
+    setImagenes((prev) => prev.filter((_, i) => i !== index));
+  };
 
-  const isFormValid = nombre && descripcion && provincia && imagenes.length > 0
+  const isFormValid = nombre && descripcion && provincia && imagenes.length > 0;
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-6 text-center text-black">Crear Producto</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-black">{`Crear Publicación de ${
+        isService ? "Servicio" : "Bien"
+      }`}</h1>
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-black" htmlFor="imagenes">
+          <label
+            className="block mb-2 text-sm font-medium text-black"
+            htmlFor="imagenes"
+          >
             Cargar imágenes (máximo 5)
           </label>
           <input
@@ -46,10 +74,17 @@ export const CreateProductScreen = () => {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {[...Array(5)].map((_, index) => (
-            <div key={index} className="relative aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+            <div
+              key={index}
+              className="relative aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden"
+            >
               {imagenes[index] ? (
                 <>
-                  <img src={imagenes[index]} alt={`Producto ${index + 1}`} className="w-full h-full object-cover" />
+                  <img
+                    src={imagenes[index]}
+                    alt={`Producto ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     onClick={() => handleDeleteImage(index)}
                     className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
@@ -64,8 +99,11 @@ export const CreateProductScreen = () => {
           ))}
         </div>
         <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-black" htmlFor="nombre">
-            Nombre del producto
+          <label
+            className="block mb-2 text-sm font-medium text-black"
+            htmlFor="nombre"
+          >
+            {`Nombre del ${isService ? "servicio" : "bien"}`}
           </label>
           <input
             type="text"
@@ -77,8 +115,11 @@ export const CreateProductScreen = () => {
           />
         </div>
         <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-black" htmlFor="descripcion">
-            Descripción del producto (máximo 250 caracteres)
+          <label
+            className="block mb-2 text-sm font-medium text-black"
+            htmlFor="descripcion"
+          >
+            Descripción (máximo 250 caracteres)
           </label>
           <textarea
             id="descripcion"
@@ -89,10 +130,15 @@ export const CreateProductScreen = () => {
             className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
           ></textarea>
-          <p className="mt-1 text-sm text-gray-500">{descripcion.length}/250 caracteres</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {descripcion.length}/250 caracteres
+          </p>
         </div>
         <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-black" htmlFor="provincia">
+          <label
+            className="block mb-2 text-sm font-medium text-black"
+            htmlFor="provincia"
+          >
             Provincia
           </label>
           <select
@@ -104,7 +150,9 @@ export const CreateProductScreen = () => {
           >
             <option value="">Selecciona una provincia</option>
             {provinciasArgentina.map((prov) => (
-              <option key={prov} value={prov}>{prov}</option>
+              <option key={prov} value={prov}>
+                {prov}
+              </option>
             ))}
           </select>
         </div>
@@ -112,12 +160,14 @@ export const CreateProductScreen = () => {
           type="button"
           disabled={!isFormValid}
           className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center ${
-            isFormValid ? 'bg-black hover:bg-black/90 focus:ring-4 focus:outline-none focus:ring-blue-300' : 'bg-gray-300 cursor-not-allowed'
+            isFormValid
+              ? "bg-black hover:bg-black/90 focus:ring-4 focus:outline-none focus:ring-blue-300"
+              : "bg-gray-300 cursor-not-allowed"
           }`}
         >
           Siguiente
         </button>
       </div>
     </div>
-  )
-}
+  );
+};

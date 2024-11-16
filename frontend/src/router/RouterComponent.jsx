@@ -4,7 +4,7 @@ import { RegisterScreen } from "../screens/RegisterScreen";
 import { RecoverPasswordScreen } from "../screens/RecoverPasswordScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { Navbar } from "../componentes/Navbar";
-import { CreateProductScreen } from "../screens/CreateProductScreen";
+import { CreatePostScreen } from "../screens/CreatePostScreen";
 
 const ProductsLayout = () => {
   return (
@@ -27,7 +27,7 @@ export const RouterComponent = () => {
       {/* Rutas con Navbar */}
       <Route path="/" element={<ProductsLayout />}>
         <Route path="/products" element={<HomeScreen />} />
-        <Route path="/createProduct" element={<CreateProductScreen />} />
+        <Route path="/createPost" element={<CreatePostScreen />} />
       </Route>
     </Routes>
   );
