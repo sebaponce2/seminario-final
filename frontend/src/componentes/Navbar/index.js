@@ -99,12 +99,20 @@ export const Navbar = () => {
           </button>
           {isCreateDropdownOpen && (
             <div className="bg-white text-black rounded-md shadow-lg py-1 mb-2">
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100">
+              <Link
+                to="/createPost?isService=false"
+                onClick={toggleCreateDropdown}
+                className="block px-4 py-2 hover:bg-gray-100"
+              >
                 Bien
-              </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100">
+              </Link>
+              <Link
+                to="/createPost?isService=true"
+                onClick={toggleCreateDropdown}
+                className="block px-4 py-2 hover:bg-gray-100"
+              >
                 Servicio
-              </a>
+              </Link>
             </div>
           )}
           <div className="bg-gray-800 rounded-md p-4 mt-2">
