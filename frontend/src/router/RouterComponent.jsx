@@ -16,7 +16,7 @@ import { MyChatsScreen } from "../screens/MyChatsScreen";
 import { MyBarteringHistory } from "../screens/MyBarteringHistory";
 import { BarteringDetails } from "../screens/MyBarteringDetails";
 
-const ProductsLayout = () => {
+const AppLayout = () => {
   return (
     <>
       <Navbar /> 
@@ -35,13 +35,13 @@ export const RouterComponent = () => {
       <Route path="/recoverPassword" element={<RecoverPasswordScreen />} />
       
       {/* Rutas con Navbar */}
-      <Route path="/" element={<ProductsLayout />}>
+      <Route path="/" element={<AppLayout />}>
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/createPost" element={<CreatePostScreen />} />
         <Route path="/recordValidation" element={<RecordScreen />} />
         <Route path="/success" element={<SuccessPostScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
-        <Route path="/productsAdmin" element={<HomeAdminScreen />} />
+        <Route path="/homeAdmin" element={<HomeAdminScreen />} />
         <Route path="/detailsPost" element={<PostDescriptionScreen />} />
         <Route path="/selectPost" element={<SelectPostScreen />} />
         <Route path="/myPosts" element={<MyPostsScreen />} />
