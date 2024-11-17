@@ -205,7 +205,7 @@ export const Navbar = ({ isAdmin = false }) => {
               Datos personales
             </Link>
             <a href="#" className="block py-2">
-              Mis productos
+              Mis publicaciones
             </a>
             <a href="#" className="block py-2">
               Historial de trueques

@@ -59,7 +59,7 @@ export const RecordScreen = () => {
         </h1>
         <p className="mb-6 text-center text-gray-700">
           A continuación, se te solicitará que grabes un video mostrando el bien
-          a publicar. Esto con el objetivo de validar que el producto es real.
+          a publicar. Esto con el objetivo de validar que el bien es real.
         </p>
         {videoUrl ? (
           <div className="space-y-4">
