@@ -36,7 +36,7 @@ export const RouterComponent = () => {
       
       {/* Rutas con Navbar */}
       <Route path="/" element={<ProductsLayout />}>
-        <Route path="/products" element={<HomeScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
         <Route path="/createPost" element={<CreatePostScreen />} />
         <Route path="/recordValidation" element={<RecordScreen />} />
         <Route path="/success" element={<SuccessPostScreen />} />

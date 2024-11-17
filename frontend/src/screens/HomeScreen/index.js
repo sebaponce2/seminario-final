@@ -118,7 +118,7 @@ export const HomeScreen = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Buscar productos..."
+                  placeholder="Buscar bien o servicio..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-10 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
@@ -139,7 +139,7 @@ export const HomeScreen = () => {
             </div>
 
             {/* Título de la sección */}
-            <h1 className="text-2xl font-bold mb-6">Todos los Productos</h1>
+            <h1 className="text-2xl font-bold mb-6">Todos los Bienes y Servicios</h1>
 
             {/* Grid de productos */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
