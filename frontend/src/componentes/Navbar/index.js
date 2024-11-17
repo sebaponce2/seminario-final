@@ -116,7 +116,7 @@ export const Navbar = ({ isAdmin = false }) => {
               onClick={toggleDropdown}
               className="block px-4 py-2 hover:bg-gray-100"
             >
-              Mis productos
+              Mis publicaciones
             </a>
             <a
               href="#"
@@ -143,14 +143,14 @@ export const Navbar = ({ isAdmin = false }) => {
       <div className="container mx-auto flex justify-between items-center">
         {isAdmin ? (
           <>
-            <Link to="/reviewProducts" className="text-xl font-bold">
+            <Link to="/homeAdmin" className="text-xl font-bold">
               TruequeUp
             </Link>
             <AdminNav />
           </>
         ) : (
           <>
-            <Link to="/products" className="text-xl font-bold">
+            <Link to="/home" className="text-xl font-bold">
               TruequeUp
             </Link>
             <UserNav />
