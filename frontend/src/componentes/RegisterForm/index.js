@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
+    profilePicture: null,
     nombre: "",
     apellido: "",
     edad: "",
@@ -11,18 +12,18 @@ export const RegisterForm = () => {
   });
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   useEffect(() => {
-    const allFieldsFilled = Object.values(formData).every(
-      (field) => field !== ""
+    const allRequiredFieldsFilled = Object.entries(formData).every(
+      ([key, value]) => key === 'profilePicture' || value !== ""
     );
     const noErrors = Object.values(errors).every((error) => error === "");
-    setIsFormValid(allFieldsFilled && noErrors);
+    setIsFormValid(allRequiredFieldsFilled && noErrors);
   }, [formData, errors]);
 
   const validateField = (name, value) => {
     let error = ''
-    // eslint-disable-next-line default-case
     switch (name) {
       case 'nombre':
       case 'apellido':
@@ -63,17 +64,33 @@ export const RegisterForm = () => {
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-
-    const error = validateField(name, value);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: error,
-    }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      const file = files[0];
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: file,
+      }));
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPreviewUrl(null);
+      }
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+      const error = validateField(name, value);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: error,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -83,10 +100,10 @@ export const RegisterForm = () => {
     }
   };
 
-  const renderInput = (name, label, type = "text", placeholder) => (
+  const renderInput = (name, label, type = "text", placeholder, isOptional = false) => (
     <div>
       <label htmlFor={name} className="block text-sm font-medium text-black">
-        {label}
+        {label} {isOptional && <span className="text-gray-500">(Opcional)</span>}
       </label>
       <input
         type={type}
@@ -99,7 +116,7 @@ export const RegisterForm = () => {
           errors[name] ? "border-red-500" : "border-gray-300"
         } rounded-md text-sm shadow-sm placeholder-gray-400
                        focus:outline-none focus:border-black focus:ring-1 focus:ring-black`}
-        required
+        required={!isOptional}
         aria-invalid={errors[name] ? "true" : "false"}
         aria-describedby={errors[name] ? `${name}-error` : undefined}
       />
@@ -114,6 +131,33 @@ export const RegisterForm = () => {
   return (
     <div>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="profilePicture" className="block text-sm font-medium text-black">
+            Foto de perfil <span className="text-gray-500">(Opcional)</span>
+          </label>
+          <input
+            type="file"
+            id="profilePicture"
+            name="profilePicture"
+            onChange={handleChange}
+            accept="image/*"
+            className="mt-1 block w-full text-sm text-gray-500
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-md file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-black file:text-white
+                       hover:file:bg-gray-800"
+          />
+          {previewUrl && (
+            <div className="mt-2 flex">
+              <img
+                src={previewUrl}
+                alt="Vista previa"
+                className="w-32 h-32 object-cover rounded-md"
+              />
+            </div>
+          )}
+        </div>
         {renderInput("nombre", "Nombre", "text", "Escriba su nombre")}
         {renderInput("apellido", "Apellido", "text", "Escriba su apellido")}
         {renderInput("edad", "Edad", "number", "Indique su edad")}
