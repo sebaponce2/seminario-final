@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const provinciasArgentina = [
   "Buenos Aires",
@@ -33,6 +33,7 @@ export const CreatePostScreen = () => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [provincia, setProvincia] = useState("");
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const isService = searchParams.get("isService") === "true";
@@ -48,6 +49,16 @@ export const CreatePostScreen = () => {
   };
 
   const isFormValid = nombre && descripcion && provincia && imagenes.length > 0;
+
+  const validateNextScreen = () => {
+    if (isFormValid) {
+      if (isService) {
+        navigate("/success");
+      } else {
+        navigate("/recordValidation");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
@@ -159,13 +170,14 @@ export const CreatePostScreen = () => {
         <button
           type="button"
           disabled={!isFormValid}
+          onClick={validateNextScreen}
           className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center ${
             isFormValid
               ? "bg-black hover:bg-black/90 focus:ring-4 focus:outline-none focus:ring-blue-300"
               : "bg-gray-300 cursor-not-allowed"
           }`}
         >
-          Siguiente
+          {`${isService ? "Finalizar" : "Siguiente"}`}
         </button>
       </div>
     </div>
