@@ -15,6 +15,7 @@ import { MyPostsScreen } from "../screens/MyPostsScreen";
 import { MyChatsScreen } from "../screens/MyChatsScreen";
 import { MyBarteringHistory } from "../screens/MyBarteringHistory";
 import { BarteringDetails } from "../screens/MyBarteringDetails";
+import { PostRequestsList } from "../screens/PostRequestsList";
 
 const AppLayout = () => {
   return (
@@ -43,6 +44,7 @@ export const RouterComponent = () => {
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/homeAdmin" element={<HomeAdminScreen />} />
         <Route path="/detailsPost" element={<PostDescriptionScreen />} />
+        <Route path="/requestsList" element={<PostRequestsList />} />
         <Route path="/selectPost" element={<SelectPostScreen />} />
         <Route path="/myPosts" element={<MyPostsScreen />} />
         <Route path="/chats" element={<MyChatsScreen />} />

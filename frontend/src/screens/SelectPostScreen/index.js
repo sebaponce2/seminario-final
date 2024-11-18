@@ -10,7 +10,7 @@ const publicaciones = [
   ];
   
 
-export const SelectPostScreen = ({ offerType = "servicio" }) => {
+export const SelectPostScreen = ({ offerType = "bien" }) => {
   const [seleccionado, setSeleccionado] = useState(null);
 
   // Filtrar y ordenar publicaciones
