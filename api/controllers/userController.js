@@ -1,6 +1,15 @@
 import { user } from '../models/user.js';
 
 // Obtener todos los usuarios
+export const getMessage = async (req, res) => {
+  try {
+    res.json({ message:'Hola' });
+  } catch (error) {
+    res.status(401).json(error);
+  }
+}
+
+
 export async function getUsers(req, res) {
   try {
     const users = await user.findAll();

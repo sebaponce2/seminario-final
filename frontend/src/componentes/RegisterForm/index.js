@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { register } from "../../plugins/providers";
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -93,10 +94,13 @@ export const RegisterForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isFormValid) {
-      console.log("Formulario enviado", formData);
+      const userValidation = await register(formData);
+
+      console.log('userValidation:', userValidation);
+      
     }
   };
 

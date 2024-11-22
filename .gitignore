@@ -5,6 +5,7 @@ frontend/node_modules
 frontend/package-lock.json
 api/node_modules
 api/package-lock.json
+api/config/serviceAccountKey.json
 
 /.pnp
 .pnp.js
