@@ -20,12 +20,13 @@ CREATE TABLE Location (
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     role_id INT NOT NULL REFERENCES Role(role_id),
+    uid VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     age VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    phone INT NOT NULL,
+    phone VARCHAR(255) NOT NULL,
     register_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,7 +45,8 @@ CREATE TABLE Product (
 -- Tabla Multimedia_storage
 CREATE TABLE Multimedia_storage (
     storage_id SERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES Product(product_id),
+    product_id INT REFERENCES Product(product_id),
+    user_id INT REFERENCES Users(user_id),
     type VARCHAR(50) NOT NULL,
     value TEXT NOT NULL
 );

@@ -1,0 +1,1 @@
+export const PROFILE_PICTURE = "PROFILE_PICTURE"

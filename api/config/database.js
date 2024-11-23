@@ -5,6 +5,9 @@ export const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER,
   host: process.env.DB_HOST,
   dialect: 'postgres',
   logging: false, // Para desactivar el log de SQL queries
+  define: {
+    freezeTableName: true, // Evita que Sequelize pluralice los nombres de las tablas
+  },
 });
 
 export const connectDB = async () => {
