@@ -25,3 +25,29 @@ export async function createUser(req, res) {
     res.status(400).json({ message: 'Error al crear usuario' });
   }
 }
+
+export async function getUserLogin(req, res) {
+  try {
+    const { uid } = req.query;
+    
+    const user = await Users.findOne({ where: { uid } });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const multimedia = await MultimediaStorage.findOne({
+      where: { user_id: user.dataValues.user_id },
+      attributes: ['value'],
+    });
+
+    const response = {
+      ...user.dataValues,
+      profile_picture: multimedia?.value || null,
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al recuperar el usuario', error });
+  }
+}

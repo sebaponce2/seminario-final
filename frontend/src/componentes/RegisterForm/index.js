@@ -20,13 +20,15 @@ export const RegisterForm = () => {
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [serviceRunning, setServiceRunning] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const allRequiredFieldsFilled = Object.entries(formData).every(
       ([key, value]) => key === "profile_picture" || value !== ""
     );
-    const noErrors = Object.values(errors).every((error) => !error); // Maneja también undefined
+    const noErrors = Object.values(errors).every((error) => !error);
+
     setIsFormValid(allRequiredFieldsFilled && noErrors);
   }, [formData, errors]);
 
@@ -113,6 +115,7 @@ export const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServiceRunning(true);
     if (isFormValid) {
       try {
         const userValidation = await register(formData);
@@ -123,7 +126,7 @@ export const RegisterForm = () => {
           const body = {
             ...formData,
             uid,
-            password: encryptPassword(formData.password)
+            password: encryptPassword(formData.password),
           };
 
           await createNewUser(body, token);
@@ -136,6 +139,8 @@ export const RegisterForm = () => {
         }
       } catch (error) {
         console.log("Error en la creación de usuario:", error);
+      } finally {
+        setServiceRunning(false);
       }
     }
   };
@@ -231,14 +236,14 @@ export const RegisterForm = () => {
         )}
         <button
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || serviceRunning}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
-                       ${
-                         isFormValid
-                           ? "bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-                           : "bg-gray-300 cursor-not-allowed"
-                       }`}
-          aria-disabled={!isFormValid}
+    ${
+      isFormValid && !serviceRunning
+        ? "bg-black hover:bg-gray-800"
+        : "bg-gray-300 cursor-not-allowed"
+    }`}
+          aria-disabled={!isFormValid || serviceRunning}
         >
           Registrarme
         </button>
