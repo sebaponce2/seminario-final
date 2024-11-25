@@ -42,3 +42,7 @@ git clone https://github.com/tu-usuario/seminario-final.git
    * Una vez finalizada la instalación, ejecutá `npm run dev` para iniciar la aplicación frontend.
 
 **¡Y listo!** Con estos pasos, deberías tener el proyecto funcionando localmente.
+
+**Usuario administrador**
+* Email: admin@gmail.com
+* Contraseña: Admin21#

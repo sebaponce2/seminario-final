@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export const SuccessPostScreen = () => {
+export const SuccessPostModal = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#E5E7EA]">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
@@ -29,8 +29,7 @@ export const SuccessPostScreen = () => {
           estado a través de un mail.
         </p>
         <Link
-          to="/products"
-          onClick={() => console.log("Volver al inicio")}
+          to="/home"
           className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
         >
           Volver al inicio

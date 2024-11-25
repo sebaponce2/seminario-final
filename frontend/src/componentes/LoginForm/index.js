@@ -4,6 +4,7 @@ import { logIn } from "../../plugins/providers";
 import { getUserLogin } from "../../services/user";
 import { saveToLocalStorage } from "../../hooks/useLocaleStorage";
 import { validateEmail, validatePassword } from "../../utils/validation";
+import { CLIENT } from "../../constants/enums";
 
 export const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -60,11 +61,16 @@ export const LoginForm = () => {
         const { token, uid } = result;
         const response = await getUserLogin(uid, token);
         if (response) {
-          saveToLocalStorage("auth", response);
-          navigate("/home");
+          const auth = {
+            ...response,
+            token,
+          };
+          saveToLocalStorage("auth", auth);
+
+          navigate(`${response.role === CLIENT ? "/home" : "/homeAdmin"}`);
         }
       } else {
-        setErrorMessage("El email o la contraseña no son correctos");
+        setErrorMessage("El email y/o la contraseña no son correctos");
       }
     } catch (error) {
       setErrorMessage("Ocurrió un error, por favor intente nuevamente");

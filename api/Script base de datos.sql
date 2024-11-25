@@ -135,3 +135,8 @@ VALUES
 ('Santiago del Estero'),
 ('Tierra del Fuego'),
 ('Tucumán');
+
+-- Insertar usuario admin
+INSERT INTO Users(role_id, uid, name, last_name, age, email, password, phone, register_date) 
+VALUES
+(2, 'mL1NVF7JEQOBQzrgWGc5KOJ44UA2','User', 'Admin', 22, 'admin@gmail.com', '', 1, NOW());

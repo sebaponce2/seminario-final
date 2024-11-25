@@ -6,7 +6,6 @@ import { HomeScreen } from "../screens/HomeScreen";
 import { Navbar } from "../componentes/Navbar";
 import { CreatePostScreen } from "../screens/CreatePostScreen";
 import { RecordScreen } from "../screens/RecordScreen";
-import { SuccessPostScreen } from "../screens/SuccessPostScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { HomeAdminScreen } from "../screens/HomeAdminScreen";
 import { PostDescriptionScreen } from "../screens/PostDescriptionScreen";
@@ -40,7 +39,6 @@ export const RouterComponent = () => {
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/createPost" element={<CreatePostScreen />} />
         <Route path="/recordValidation" element={<RecordScreen />} />
-        <Route path="/success" element={<SuccessPostScreen />} />
         <Route path="/profile" element={<ProfileScreen />} />
         <Route path="/homeAdmin" element={<HomeAdminScreen />} />
         <Route path="/detailsPost" element={<PostDescriptionScreen />} />
