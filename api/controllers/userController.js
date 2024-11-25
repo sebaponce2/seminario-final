@@ -1,5 +1,6 @@
 import {
   PRODUCT_IMAGE,
+  PRODUCT_VIDEO,
   PROFILE_PICTURE,
   WAITING_FOR_APPROVAL,
 } from "../constants/enums.js";
@@ -68,7 +69,7 @@ export async function getUserLogin(req, res) {
 // Crear una publicación
 export async function createPost(req, res) {
   try {
-    const { images, ...filteredBody } = req.body;
+    const { images, isService, video, ...filteredBody } = req.body;
 
     const bodyProduct = {
       ...filteredBody,
@@ -89,6 +90,16 @@ export async function createPost(req, res) {
       });
 
       MultimediaStorage.bulkCreate(bodyImage);
+
+      if (!isService) {
+        const bodyVideo = {
+          value: video,
+          type: PRODUCT_VIDEO,
+          product_id
+        }
+
+        MultimediaStorage.create(bodyVideo);
+      }
     }
 
     res.status(201).json({message: "OK"});

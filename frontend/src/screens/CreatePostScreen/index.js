@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
+import { loadFromLocalStorage, saveToLocalStorage } from "../../hooks/useLocaleStorage";
 import { createNewPost } from "../../services/posts";
 import { SuccessPostModal } from "../../componentes/SuccessPostModal";
 
@@ -93,6 +93,7 @@ export const CreatePostScreen = () => {
       const body = {
         ...formData,
         user_id,
+        isService,
         category_id: 1,
       };
 
@@ -107,7 +108,7 @@ export const CreatePostScreen = () => {
           console.log("Error al crear nueva publicación:", error);
         }
       } else {
-        loadFromLocalStorage("savedPost", body);
+        saveToLocalStorage("savedPost", body);
         navigate("/recordValidation");
       }
     }
