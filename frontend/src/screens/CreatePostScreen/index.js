@@ -94,7 +94,7 @@ export const CreatePostScreen = () => {
         ...formData,
         user_id,
         isService,
-        category_id: 1,
+        category_id: isService ? 4 : 1,
       };
 
       if (isService) {

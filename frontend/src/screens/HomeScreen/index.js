@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
+import { getPostsUserClient } from "../../services/posts";
 
 const categories = [
   "Muebles",
@@ -29,63 +31,35 @@ const provinces = [
   "Jujuy",
 ];
 
-const products = [
-  {
-    name: "Sillón de cuero",
-    province: "Buenos Aires",
-    category: "Muebles",
-    image:
-      "https://mijormi.vteximg.com.br/arquivos/ids/173628-1000-1332/Sillon-clasico-cuero-SILLON-CHESTERFIELD-CUERO-HARNESS-124-Landmark-0.jpg?v=637707763572300000",
-  },
-  {
-    name: "Camisa de algodón",
-    province: "Córdoba",
-    category: "Ropa",
-    image:
-      "https://www.roperialeonardoberazategui.com.ar/wp-content/uploads/2020/07/RCA-0004-Verde_3.jpg",
-  },
-  {
-    name: "Licuadora",
-    province: "Santa Fe",
-    category: "Electrodomésticos",
-    image:
-      "https://promart.vteximg.com.br/arquivos/ids/8038318-1000-1000/146429.jpg?v=638550399397300000",
-  },
-  {
-    name: "Muñeca de peluche",
-    province: "Mendoza",
-    category: "Juguetes",
-    image:
-      "https://i5.walmartimages.com/asr/fd4e2ff1-44d1-4c35-8a28-29c761b3f9de.bf06c2b1dae184aea306e1c2541929d4.png?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
-  },
-  {
-    name: "Kit de primeros auxilios",
-    province: "Tucumán",
-    category: "Salud",
-    image:
-      "https://cvfaunia.com/wp-content/uploads/2021/11/empleo-3-1024x683.jpg",
-  },
-  {
-    name: "Shampoo orgánico",
-    province: "Entre Ríos",
-    category: "Higiene",
-    image:
-      "https://p.turbosquid.com/ts-thumb/h1/2OPzpv/9t/z0000/jpg/1700461568/1920x1080/turn_fit_q99/04a159fd810ccdb6e67c7ae9a8a2d01e330c80d5/z0000-1.jpg",
-  },
-];
-
 export const HomeScreen = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [posts, setPosts] = useState([]);
 
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = posts.filter((post) => {
     const matchesProvince =
-      selectedProvince === "" || product.province === selectedProvince;
+      selectedProvince === "" || post.location === selectedProvince;
     const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.category.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesProvince && matchesSearch;
   });
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    const { token } = loadFromLocalStorage("auth");
+
+    const data = await getPostsUserClient(token);
+
+    if (data) {
+      setPosts(data);
+    }
+
+    console.log("token:", token);
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
@@ -130,33 +104,35 @@ export const HomeScreen = () => {
                 className="px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white"
               >
                 <option value="">Todas las provincias</option>
-                {provinces.map((province, index) => (
-                  <option key={index} value={province}>
-                    {province}
+                {provinces.map((location, index) => (
+                  <option key={index} value={location}>
+                    {location}
                   </option>
                 ))}
               </select>
             </div>
 
             {/* Título de la sección */}
-            <h1 className="text-2xl font-bold mb-6">Todos los Bienes y Servicios</h1>
+            <h1 className="text-2xl font-bold mb-6">
+              Todos los Bienes y Servicios
+            </h1>
 
             {/* Grid de productos */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product, index) => (
+              {filteredProducts.map((post, index) => (
                 <article
                   key={index}
                   className="bg-white rounded-lg overflow-hidden border-2 border-gray-100"
                 >
                   <img
-                    src={product.image}
-                    alt={product.name}
+                    src={post?.images[0]}
+                    alt={post.title}
                     className="w-full h-64 object-cover"
                   />
                   <div className="p-4">
-                    <h3 className="text-xl font-bold mb-2">{product.name}</h3>
-                    <p className="text-gray-500 mb-1">{product.province}</p>
-                    <p className="text-gray-500">{product.category}</p>
+                    <h3 className="text-xl font-bold mb-2">{post.title}</h3>
+                    <p className="text-gray-500 mb-1">{post.location}</p>
+                    <p className="text-gray-500">{post.category}</p>
                   </div>
                 </article>
               ))}
