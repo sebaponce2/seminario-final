@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { getPostsUserAdmin } from "../../services/posts";
+import { useNavigate } from "react-router-dom";
 
 export const HomeAdminScreen = () => {
   const [posts, setPosts] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
@@ -29,7 +32,11 @@ export const HomeAdminScreen = () => {
         {posts.map((post) => (
           <div
             key={post.product_id}
-            className="bg-white rounded-lg shadow-md overflow-hidden"
+            className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer"
+            onClick={() => {
+              const { product_id } = post;
+              navigate("/detailsPost", { state: product_id });
+            }}
           >
             <img
               src={post.images[0]}

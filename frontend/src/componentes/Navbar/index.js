@@ -43,7 +43,7 @@ export const Navbar = () => {
               "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
             }
             alt="Logo de administrador"
-            className="w-8 h-8 rounded-full"
+            className="w-8 h-8 rounded-full object-cover"
           />
           <ChevronDown
             className={`w-4 h-4 transition-transform duration-200 ${
@@ -52,7 +52,7 @@ export const Navbar = () => {
           />
         </button>
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1">
+          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50">
             <Link
               to="/login"
               onClick={toggleDropdown}
@@ -115,7 +115,7 @@ export const Navbar = () => {
               "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
             }
             alt="Usuario"
-            className="w-8 h-8 rounded-full"
+            className="w-8 h-8 rounded-full object-cover"
           />
           <ChevronDown
             className={`w-4 h-4 transition-transform duration-200 ${
@@ -124,7 +124,7 @@ export const Navbar = () => {
           />
         </button>
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1">
+          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg py-1 z-50">
             <Link
               to="/profile"
               onClick={toggleDropdown}
@@ -213,7 +213,7 @@ export const Navbar = () => {
               </Link>
             </div>
           )}
-          <div className="bg-gray-800 rounded-md p-4 mt-2">
+          <div className="bg-gray-800 rounded-md p-4 mt-2 z-50">
             <div className="flex items-center space-x-2 mb-4">
               <span>{`${user?.name} ${user?.last_name}`}</span>
               <img
@@ -222,7 +222,7 @@ export const Navbar = () => {
                   "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
                 }
                 alt="Usuario"
-                className="w-8 h-8 rounded-full"
+                className="w-8 h-8 rounded-full object-cover"
               />
             </div>
             <Link onClick={toggleMenu} to="/profile" className="block py-2">

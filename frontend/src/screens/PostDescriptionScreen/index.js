@@ -1,29 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const publicacion = {
-  id: 1,
-  nombre: "Clases de guitarra",
-  fotos: [
-    "https://images.freeimages.com/images/large-previews/2ee/hands-playing-guitar-1528655.jpg",
-    "https://images.freeimages.com/images/large-previews/2ee/hands-playing-guitar-1528655.jpg",
-    "https://images.freeimages.com/images/large-previews/2ee/hands-playing-guitar-1528655.jpg",
-  ],
-  creador: {
-    nombre: "Juan",
-    apellido: "Pérez",
-    foto: "https://i.pinimg.com/550x/57/70/f0/5770f01a32c3c53e90ecda61483ccb08.jpg",
-  },
-  locacion: "Buenos Aires, Argentina",
-  descripcion:
-    "Ofrezco clases particulares de guitarra para principiantes e intermedios. Aprende desde las bases hasta técnicas avanzadas, incluyendo teoría musical y canciones populares. Flexibilidad horaria y clases personalizadas según tus intereses musicales.",
-  esMiPublicacion: false,
-  tipo: "servicio",
-};
-
+import { getDescriptionPost, updateStatusPost } from "../../services/posts";
+import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
+import { useLocation, useNavigate } from "react-router-dom";
+import { SUPER_ADMIN } from "../../constants/enums";
 
 const CustomArrow = ({ onClick, direction }) => {
   const positionClass = direction === "left" ? "left-2" : "right-2";
@@ -48,9 +31,17 @@ const CustomArrow = ({ onClick, direction }) => {
   );
 };
 
-export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
+export const PostDescriptionScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [auth, setAuth] = useState();
+  const [postDescription, setPostDescription] = useState();
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
+
+  const location = useLocation();
+  const { state: product_id } = location || {};
+
+  const navigate = useNavigate();
 
   const settings = {
     dots: true,
@@ -61,6 +52,24 @@ export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
     adaptiveHeight: false,
     nextArrow: <CustomArrow direction="right" />,
     prevArrow: <CustomArrow direction="left" />,
+  };
+
+  useEffect(() => {
+    if (product_id) {
+      getData();
+    }
+  }, []);
+
+  const getData = async () => {
+    const auth = loadFromLocalStorage("auth");
+    const data = await getDescriptionPost(product_id, auth.token);
+    setAuth(auth);
+    console.log("auth:", auth);
+
+    if (data) {
+      console.log("data:", data);
+      setPostDescription({ ...data, images: [...new Set(data?.images)] });
+    }
   };
 
   const openModal = (index) => {
@@ -78,21 +87,40 @@ export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
     }
   };
 
+  const handleVideoClick = () => {
+    setIsVideoVisible(!isVideoVisible);
+  };
+
+  const handleChangePostStatus = async (isApproved) => {
+    try {
+      const body = {
+        product_id,
+        isApproved,
+      };
+      const response = await updateStatusPost(body, auth?.token);
+      if (response) {
+        navigate(auth.role === SUPER_ADMIN ? "/homeAdmin" : "/home");
+      }
+    } catch (error) {
+      console.log("Error al cambiar estado de la publicación:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#E5E7EA] p-4 md:p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Carrusel de fotos */}
         <div className="relative">
           <Slider {...settings}>
-            {publicacion.fotos.map((foto, index) => (
+            {postDescription?.images?.map((image, index) => (
               <div
                 key={index}
                 className="h-96 cursor-pointer"
                 onClick={() => openModal(index)}
               >
                 <img
-                  src={foto}
-                  alt={`Foto ${index + 1} de ${publicacion.nombre}`}
+                  src={`${image}`}
+                  alt={`Foto ${index} de ${postDescription?.title}`}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -102,31 +130,30 @@ export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
 
         <div className="p-6">
           {/* Información de la publicación */}
-          <h1 className="text-3xl font-bold mb-4">{publicacion.nombre}</h1>
+          <h1 className="text-3xl font-bold mb-4">{postDescription?.title}</h1>
 
           <div className="flex items-center mb-4">
             <img
-              src={publicacion.creador.foto}
-              alt={`${publicacion.creador.nombre} ${publicacion.creador.apellido}`}
-              className="w-12 h-12 rounded-full mr-4"
+              src={postDescription?.post_creator?.profile_picture}
+              alt={`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}
+              className="w-12 h-12 rounded-full mr-4 object-cover"
             />
             <div>
-              <p className="font-semibold">{`${publicacion.creador.nombre} ${publicacion.creador.apellido}`}</p>
-              <p className="text-gray-600">{publicacion.locacion}</p>
+              <p className="font-semibold">{`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}</p>
+              <p className="text-gray-600">{postDescription?.location}</p>
             </div>
           </div>
 
-          {isAdmin && (
+          {auth?.role === SUPER_ADMIN && (
             <div className="mb-4">
               <span
                 className={`inline-block px-2 py-1 rounded-full text-sm font-semibold ${
-                  publicacion.tipo === "bien"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-green-100 text-green-800"
+                  postDescription?.type === "Bien"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-blue-100 text-blue-800"
                 }`}
               >
-                {publicacion.tipo.charAt(0).toUpperCase() +
-                  publicacion.tipo.slice(1)}
+                {postDescription?.type}
               </span>
             </div>
           )}
@@ -134,40 +161,59 @@ export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
           {/* Descripción en un cuadro */}
           <div className="mb-8 p-4 border border-gray-300 rounded-lg shadow-sm">
             <h2 className="text-xl font-semibold mb-2">Descripción</h2>
-            <p>{publicacion.descripcion}</p>
+            <p>{postDescription?.description}</p>
           </div>
 
           {/* Botones de acción */}
-          {isAdmin ? (
+          {auth?.role === SUPER_ADMIN ? (
             <div className="flex flex-col gap-4">
-              {publicacion.tipo === "bien" && (
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
-                    Visualizar video
+              {postDescription?.type === "Bien" && (
+                <div className=" sm:flex-row gap-4">
+                  <button
+                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                    onClick={handleVideoClick}
+                  >
+                    {isVideoVisible ? "Cerrar video" : "Visualizar video"}
                   </button>
+                  {isVideoVisible && postDescription?.video && (
+                    <div className="mt-4">
+                      <video
+                        controls
+                        className="w-full"
+                        src={postDescription?.video}
+                        alt="Video de publicación"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition duration-300">
+                <button
+                  onClick={() => handleChangePostStatus(true)}
+                  className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition duration-300"
+                >
                   Aprobar
                 </button>
-                <button className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-300">
+                <button
+                  onClick={() => handleChangePostStatus(false)}
+                  className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-300"
+                >
                   Rechazar
                 </button>
               </div>
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4">
-              {userId === 102 ? (
-                <button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
+              {auth?.user_id === postDescription?.post_creator?.user_id ? (
+                <button onClick={() => navigate("/requestsList")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
                   Ver listado de solicitudes
                 </button>
               ) : (
                 <>
-                  <button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
+                  <button onClick={() => navigate("/chats")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
                     Enviar un mensaje
                   </button>
-                  <button className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
+                  <button onClick={() => navigate("/selectPost")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
                     Solicitar trueque
                   </button>
                 </>
@@ -186,10 +232,10 @@ export const PostDescriptionScreen = ({ isAdmin = true, userId = 101 }) => {
         >
           <div className="relative w-11/12 md:w-2/3">
             <Slider {...settings} initialSlide={selectedImageIndex}>
-              {publicacion.fotos.map((foto, index) => (
+              {postDescription?.images?.map((image, index) => (
                 <div key={index}>
                   <img
-                    src={foto}
+                    src={image}
                     alt={`Foto ampliada ${index + 1}`}
                     className="w-full h-[75vh] object-contain"
                   />

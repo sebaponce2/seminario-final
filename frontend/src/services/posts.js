@@ -29,3 +29,28 @@ export const getPostsUserAdmin = async (token) => {
     .then((response) => response.data)
     .catch((error) => console.error(error));
 };
+
+export const getDescriptionPost = async (productId, token) => {
+  return await client
+    .get(`getPostDescription/${productId}`, {
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+};
+
+export const updateStatusPost = async (body, token) => {
+  try {
+    const response = await client.put(`updatePostStatus`, body, {
+      headers: {
+        token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar el estado del post:', error);
+    throw error;
+  }
+};

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { getPostsUserClient } from "../../services/posts";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   "Muebles",
@@ -35,6 +36,7 @@ export const HomeScreen = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
 
   const filteredProducts = posts.filter((post) => {
     const matchesProvince =
@@ -121,8 +123,12 @@ export const HomeScreen = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map((post, index) => (
                 <article
+                  onClick={() => {
+                    const { product_id } = post;
+                    navigate("/detailsPost", { state: product_id });
+                  }}
                   key={index}
-                  className="bg-white rounded-lg overflow-hidden border-2 border-gray-100"
+                  className="bg-white rounded-lg overflow-hidden border-2 border-gray-100 bg-black cursor-pointer"
                 >
                   <img
                     src={post?.images[0]}
