@@ -58,10 +58,13 @@ CREATE TABLE Exchanges (
     requesting_user_id INT NOT NULL REFERENCES Users(user_id),
     offering_product_id INT NOT NULL REFERENCES Product(product_id),
     requesting_product_id INT NOT NULL REFERENCES Product(product_id),
+    status_offering_user VARCHAR(50) NOT NULL,
+    status_requesting_user VARCHAR(50) NOT NULL,
     status VARCHAR(50) NOT NULL,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Tabla Product_requests
 CREATE TABLE Product_requests (

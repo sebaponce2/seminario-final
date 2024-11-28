@@ -220,7 +220,7 @@ export const Exchanges = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Users,
+        model: Users, // Nombre del modelo relacionado
         key: "user_id",
       },
     },
@@ -228,7 +228,7 @@ export const Exchanges = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Users,
+        model: Users, // Nombre del modelo relacionado
         key: "user_id",
       },
     },
@@ -236,7 +236,7 @@ export const Exchanges = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Product,
+        model: Product, // Nombre del modelo relacionado
         key: "product_id",
       },
     },
@@ -244,9 +244,17 @@ export const Exchanges = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Product,
+        model: Product, // Nombre del modelo relacionado
         key: "product_id",
       },
+    },
+    status_offering_user: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status_requesting_user: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     status: {
       type: DataTypes.STRING,
@@ -262,7 +270,7 @@ export const Exchanges = sequelize.define(
     },
   },
   {
-    timestamps: false,
+    timestamps: false, // Desactiva el manejo automático de timestamps por Sequelize
   }
 );
 

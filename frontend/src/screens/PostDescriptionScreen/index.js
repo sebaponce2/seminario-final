@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   cancelRequestExchange,
   getDescriptionPost,
@@ -10,30 +9,8 @@ import {
 } from "../../services/posts";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
-
-const CustomArrow = ({ onClick, direction }) => {
-  const positionClass = direction === "left" ? "left-2" : "right-2";
-
-  return (
-    <div
-      onClick={onClick}
-      className={`absolute top-1/2 transform -translate-y-1/2 ${positionClass} 
-        bg-black/60 rounded-full p-2 cursor-pointer z-10 
-        flex items-center justify-center hover:bg-black/80 transition duration-300`}
-      style={{
-        width: "40px",
-        height: "40px",
-      }}
-    >
-      {direction === "left" ? (
-        <ChevronLeft className="w-6 h-6 text-white" />
-      ) : (
-        <ChevronRight className="w-6 h-6 text-white" />
-      )}
-    </div>
-  );
-};
+import { APPROVED, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
+import { CustomArrow } from "../../componentes/CustomArrow";
 
 export const PostDescriptionScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,13 +42,11 @@ export const PostDescriptionScreen = () => {
   }, []);
 
   const getData = async () => {
-    const auth = loadFromLocalStorage("auth");
+    const auth = await loadFromLocalStorage("auth");
     const data = await getDescriptionPost(product_id, auth.token);
     setAuth(auth);
-    console.log("auth:", auth);
 
     if (data) {
-      console.log("data:", data);
       setPostDescription({ ...data, images: [...new Set(data?.images)] });
     }
   };
@@ -120,7 +95,6 @@ export const PostDescriptionScreen = () => {
         ...prev,
         user_post_status: null,
       }));
-      
     } catch (error) {
       console.log("Error al cancelar trueque.");
     }
@@ -226,10 +200,20 @@ export const PostDescriptionScreen = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               {auth?.user_id === postDescription?.post_creator?.user_id ? (
                 <button
-                  onClick={() => navigate("/requestsList")}
+                  onClick={() => {
+                    postDescription?.state === APPROVED
+                      ? navigate("/requestsList", {
+                          state: postDescription,
+                        })
+                      : navigate("/barteringDetails", {
+                          state: postDescription,
+                        });
+                  }}
                   className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
                 >
-                  Ver listado de solicitudes
+                  {postDescription?.state === APPROVED
+                    ? "Ver listado de solicitudes"
+                    : "Ver estado del trueque"}
                 </button>
               ) : (
                 <>

@@ -3,14 +3,18 @@ import admin from "../config/firebase-config.js";
 import {
   APPROVED,
   CANCELED,
+  CONFIRMED_USER_EXCHANGE,
+  EXCHANGE_COMPLETED,
+  EXCHANGE_IN_PROGRESS,
   OFFERED,
-  PENDING,
   PENDING_APPROVAL,
   PRODUCT_IMAGE,
   PRODUCT_VIDEO,
   PROFILE_PICTURE,
   REJECTED,
+  WAITING_EXCHANGE_CONFIRMATION,
   WAITING_FOR_APPROVAL,
+  WAITING_USER_CONFIRMATION,
 } from "../constants/enums.js";
 import {
   Category,
@@ -289,8 +293,6 @@ export async function getPostDescription(req, res) {
 
     res.status(200).json(response);
   } catch (error) {
-    console.log("error:", error);
-
     res.status(500).json({
       message: "Error al recuperar la descripcion de la publicación",
       error: error.message,
@@ -357,15 +359,16 @@ export async function getPostsToExchange(req, res) {
         const images = multimedia.map((media) => media.value);
 
         // Valida si existe un intercambio asociado
-        console.log('product.product_id:', product.product_id);
-        
         const exchange = await ProductRequests.findOne({
-          where: { offering_product_id: product.product_id, status: PENDING_APPROVAL },
+          where: {
+            offering_product_id: product.product_id,
+            status: PENDING_APPROVAL,
+          },
         });
-        
+
         // Modificar el estado del producto si existe un intercambio
         const productState = exchange ? OFFERED : product.state;
-        
+
         return {
           ...product.toJSON(),
           images,
@@ -448,5 +451,286 @@ export async function cancelExchangeRequest(req, res) {
   } catch (error) {
     console.log("Error al modificar publicación:", error);
     res.status(400).json({ message: "Error al modificar publicación." });
+  }
+}
+
+export async function getPostRequestsList(req, res) {
+  const { product_id } = req.query;
+
+  try {
+    // Obtener productos cuyo estado sea APPROVED
+    const postRequestsList = await ProductRequests.findAll({
+      where: {
+        requesting_product_id: product_id,
+        status: PENDING_APPROVAL,
+      },
+    });
+
+    const response = await Promise.all(
+      postRequestsList.map(async (request) => {
+        // Obtener las imágenes del producto
+        const multimediaImages = await MultimediaStorage.findAll({
+          where: {
+            product_id: request.offering_product_id,
+            type: PRODUCT_IMAGE,
+          },
+        });
+
+        const images = multimediaImages.map((media) => media.value);
+
+        const product = await Product.findOne({
+          where: { product_id: request.offering_product_id },
+          attributes: ["title"],
+        });
+
+        const user = await Users.findOne({
+          where: { user_id: request.offering_user_id },
+        });
+
+        const multimediaProfile = await MultimediaStorage.findOne({
+          where: { user_id: request.offering_user_id, type: PROFILE_PICTURE },
+        });
+
+        return {
+          ...request.toJSON(),
+          offering_product_images: images,
+          offering_product_title: product.title,
+          user_requesting: {
+            ...user.dataValues,
+            profile_photo: multimediaProfile.dataValues.value,
+          },
+        };
+      })
+    );
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.log("error:", error);
+
+    res
+      .status(500)
+      .json({ message: "Error al obtener las solicitudes", error });
+  }
+}
+
+export async function updateExchangeRequestStatus(req, res) {
+  try {
+    const { status, product_requests_id } = req.body;
+
+    const [updated] = await ProductRequests.update(
+      { status: status },
+      {
+        where: {
+          product_requests_id: product_requests_id,
+        },
+        returning: true,
+      }
+    );
+
+    if (updated && status === EXCHANGE_IN_PROGRESS) {
+      // Obtener la solicitud actualizada
+      const request = await ProductRequests.findOne({
+        where: { product_requests_id: product_requests_id },
+      });
+
+      const product_id = request.dataValues.requesting_product_id;
+
+      const [productUpdated] = await Product.update(
+        { state: EXCHANGE_IN_PROGRESS },
+        {
+          where: { product_id: product_id },
+        }
+      );
+
+      if (!productUpdated) {
+        return res
+          .status(400)
+          .json({ message: "No se pudo actualizar el estado del producto." });
+      }
+      const {
+        requesting_product_id,
+        requesting_user_id,
+        offering_product_id,
+        offering_user_id,
+      } = request?.dataValues;
+
+      const bodyExchange = {
+        offering_user_id,
+        requesting_user_id,
+        offering_product_id,
+        requesting_product_id,
+        status: WAITING_EXCHANGE_CONFIRMATION,
+        status_offering_user: WAITING_USER_CONFIRMATION,
+        status_requesting_user: WAITING_USER_CONFIRMATION,
+        created_date: new Date(),
+        modified_date: new Date(),
+      };
+
+      await Exchanges.create(bodyExchange);
+    }
+
+    res.status(200).json({ message: "Estado actualizado correctamente." });
+  } catch (error) {
+    console.log("Error al modificar estado de solicitud:", error);
+    res
+      .status(500)
+      .json({ message: "Error al modificar estado de solicitud." });
+  }
+}
+
+export async function getExchangeDetails(req, res) {
+  const { requesting_product_id } = req.query;
+
+  try {
+    const exchange = await Exchanges.findOne({
+      where: { requesting_product_id: requesting_product_id },
+    });
+
+    if (!exchange) {
+      return res.status(404).json({
+        message: "Trueque no encontrado",
+      });
+    }
+
+    const {
+      offering_user_id,
+      requesting_user_id,
+      offering_product_id,
+      status_offering_user,
+      status_requesting_user,
+      status,
+    } = exchange.dataValues;
+
+    // Consultar información del usuario que solicita
+    const requesting_user = await Users.findOne({
+      where: { user_id: requesting_user_id },
+    });
+
+    const multimedia_requesting_user_profile = await MultimediaStorage.findOne({
+      where: { user_id: requesting_user_id, type: PROFILE_PICTURE },
+    });
+
+    const requesting_product = await Product.findOne({
+      where: { product_id: requesting_product_id },
+    });
+
+    const multimedia_images_requesting_product =
+      await MultimediaStorage.findAll({
+        where: { product_id: requesting_product_id, type: PRODUCT_IMAGE },
+      });
+
+    const images_requesting_product = multimedia_images_requesting_product.map(
+      (image) => image.value
+    );
+
+    // Consultar información del usuario que ofrece
+    const offering_user = await Users.findOne({
+      where: { user_id: offering_user_id },
+    });
+
+    const multimedia_offering_user_profile = await MultimediaStorage.findOne({
+      where: { user_id: offering_user_id, type: PROFILE_PICTURE },
+    });
+
+    const offering_product = await Product.findOne({
+      where: { product_id: offering_product_id },
+    });
+
+    const multimedia_images_offering_product = await MultimediaStorage.findAll({
+      where: { product_id: offering_product_id, type: PRODUCT_IMAGE },
+    });
+
+    const images_offering_product = multimedia_images_offering_product.map(
+      (image) => image.value
+    );
+
+    const response = {
+      exchange: {
+        exchange_id: exchange?.dataValues?.exchange_id,
+        status,
+        status_offering_user,
+        status_requesting_user,
+      },
+      requesting_user: {
+        user: {
+          id: requesting_user.user_id,
+          name: requesting_user?.dataValues?.name,
+          last_name: requesting_user?.dataValues?.last_name,
+          profile_picture:
+            multimedia_requesting_user_profile?.dataValues?.value || null,
+        },
+        product: {
+          id: requesting_product?.dataValues?.product_id,
+          title: requesting_product?.dataValues?.title,
+          description: requesting_product?.dataValues?.description,
+          images: images_requesting_product,
+        },
+      },
+      offering_user: {
+        user: {
+          id: offering_user?.dataValues?.user_id,
+          name: offering_user?.dataValues?.name,
+          last_name: offering_user?.dataValues?.last_name,
+          profile_picture:
+            multimedia_offering_user_profile?.dataValues?.value || null,
+        },
+        product: {
+          id: offering_product?.dataValues?.product_id,
+          title: offering_product?.dataValues?.title,
+          description: offering_product?.dataValues?.description,
+          images: images_offering_product,
+        },
+      },
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.log("Error:", error);
+
+    res.status(500).json({
+      message: "Error al recuperar la descripción del trueque",
+      error: error.message,
+    });
+  }
+}
+
+export async function confirmExchange(req, res) {
+  try {
+    const { exchange_id, offering_user_id, requesting_user_id } = req.body;
+
+    const updateData = offering_user_id
+      ? { status_offering_user: CONFIRMED_USER_EXCHANGE }
+      : { status_requesting_user: CONFIRMED_USER_EXCHANGE };
+
+    const whereCondition = offering_user_id
+      ? { offering_user_id, exchange_id }
+      : { requesting_user_id, exchange_id };
+
+    // Actualizar el estado del usuario correspondiente
+    await Exchanges.update(updateData, {
+      where: whereCondition,
+    });
+
+    // Verificar si ambos estados están confirmados
+    const exchange = await Exchanges.findOne({ where: { exchange_id } });
+
+    if (
+      exchange.status_offering_user === CONFIRMED_USER_EXCHANGE &&
+      exchange.status_requesting_user === CONFIRMED_USER_EXCHANGE
+    ) {
+      await Exchanges.update(
+        { status: EXCHANGE_COMPLETED },
+        { where: { exchange_id } }
+      );
+    }
+
+    res
+      .status(200)
+      .json({ message: "Estado de confirmación actualizado con éxito." });
+  } catch (error) {
+    console.error("Error al modificar el estado de confirmación:", error);
+    res
+      .status(400)
+      .json({ message: "Error al modificar el estado de confirmación." });
   }
 }

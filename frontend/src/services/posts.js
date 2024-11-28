@@ -50,7 +50,7 @@ export const updateStatusPost = async (body, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error al actualizar el estado del post:', error);
+    console.error("Error al actualizar el estado del post:", error);
     throw error;
   }
 };
@@ -76,7 +76,7 @@ export const createNewExchangeRequest = async (body, token) => {
       token,
     },
   });
-}
+};
 
 export const cancelRequestExchange = async (body, token) => {
   try {
@@ -87,7 +87,63 @@ export const cancelRequestExchange = async (body, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error al actualizar el estado del post:', error);
+    console.error("Error al actualizar el estado del post:", error);
+    throw error;
+  }
+};
+
+export const getRequestsList = async (product_id, token) => {
+  return await client
+    .get("getPostRequestsList", {
+      params: {
+        product_id,
+      },
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+};
+
+export const updateStatusExchangeRequest = async (body, token) => {
+  try {
+    const response = await client.put(`updateExchangeRequestStatus`, body, {
+      headers: {
+        token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al actualizar el estado del post:", error);
+    throw error;
+  }
+};
+
+export const getDetailsExchange = async (requesting_product_id, token) => {
+  return await client
+    .get("getExchangeDetails", {
+      params: {
+        requesting_product_id,
+      },
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+};
+
+export const exchangeConfirmation = async (body, token) => {
+  try {
+    const response = await client.put(`confirmExchange`, body, {
+      headers: {
+        token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al actualizar el estado de confirmación:", error);
     throw error;
   }
 };

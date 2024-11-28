@@ -1,14 +1,18 @@
 import { Router } from "express";
 import {
   cancelExchangeRequest,
+  confirmExchange,
   createPost,
   createRequestExchange,
   createUser,
+  getExchangeDetails,
   getPostDescription,
+  getPostRequestsList,
   getPostsAdmin,
   getPostsClient,
   getPostsToExchange,
   getUserLogin,
+  updateExchangeRequestStatus,
   updatePostStatus,
 } from "../controllers/controllers.js";
 
@@ -24,5 +28,9 @@ router.put("/updatePostStatus", updatePostStatus);
 router.get("/getPostsToExchange", getPostsToExchange);
 router.post("/createExchangeRequest", createRequestExchange);
 router.put("/cancelExchangeRequest", cancelExchangeRequest);
+router.get("/getPostRequestsList", getPostRequestsList);
+router.put("/updateExchangeRequestStatus", updateExchangeRequestStatus);
+router.get("/getExchangeDetails", getExchangeDetails);
+router.put("/confirmExchange", confirmExchange);
 
 export default router;
