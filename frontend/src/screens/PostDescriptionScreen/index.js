@@ -3,10 +3,14 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getDescriptionPost, updateStatusPost } from "../../services/posts";
+import {
+  cancelRequestExchange,
+  getDescriptionPost,
+  updateStatusPost,
+} from "../../services/posts";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
-import { SUPER_ADMIN } from "../../constants/enums";
+import { PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
 
 const CustomArrow = ({ onClick, direction }) => {
   const positionClass = direction === "left" ? "left-2" : "right-2";
@@ -103,6 +107,22 @@ export const PostDescriptionScreen = () => {
       }
     } catch (error) {
       console.log("Error al cambiar estado de la publicación:", error);
+    }
+  };
+
+  const handleCancelExchangeRequest = async () => {
+    try {
+      const body = {
+        product_id,
+      };
+      await cancelRequestExchange(body, auth.token);
+      setPostDescription((prev) => ({
+        ...prev,
+        user_post_status: null,
+      }));
+      
+    } catch (error) {
+      console.log("Error al cancelar trueque.");
     }
   };
 
@@ -205,16 +225,35 @@ export const PostDescriptionScreen = () => {
           ) : (
             <div className="flex flex-col sm:flex-row gap-4">
               {auth?.user_id === postDescription?.post_creator?.user_id ? (
-                <button onClick={() => navigate("/requestsList")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
+                <button
+                  onClick={() => navigate("/requestsList")}
+                  className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                >
                   Ver listado de solicitudes
                 </button>
               ) : (
                 <>
-                  <button onClick={() => navigate("/chats")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
+                  <button
+                    onClick={() => navigate("/chats")}
+                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                  >
                     Enviar un mensaje
                   </button>
-                  <button onClick={() => navigate("/selectPost")} className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
-                    Solicitar trueque
+                  <button
+                    onClick={() => {
+                      postDescription?.user_post_status === PENDING_APPROVAL
+                        ? handleCancelExchangeRequest()
+                        : navigate("/selectPost", { state: postDescription });
+                    }}
+                    className={`${
+                      postDescription?.user_post_status === PENDING_APPROVAL
+                        ? "bg-red-800 hover:bg-red-700"
+                        : "bg-black hover:bg-gray-800"
+                    } text-white px-6 py-2 rounded-md transition duration-300`}
+                  >
+                    {postDescription?.user_post_status === PENDING_APPROVAL
+                      ? "Cancelar solicitud"
+                      : "Solicitar trueque"}
                   </button>
                 </>
               )}

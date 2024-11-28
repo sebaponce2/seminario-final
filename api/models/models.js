@@ -275,7 +275,7 @@ export const ProductRequests = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    product_id: {
+    requesting_product_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -299,6 +299,14 @@ export const ProductRequests = sequelize.define(
         key: "product_id",
       },
     },
+    offering_user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Users,
+        key: "user_id",
+      },
+    },
     status: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -316,6 +324,7 @@ export const ProductRequests = sequelize.define(
     timestamps: false,
   }
 );
+
 
 // Modelo Chat
 export const Chat = sequelize.define(

@@ -54,3 +54,40 @@ export const updateStatusPost = async (body, token) => {
     throw error;
   }
 };
+
+export const getMyPostsToExchange = async (user_id, isService, token) => {
+  return await client
+    .get("getPostsToExchange", {
+      params: {
+        user_id,
+        isService,
+      },
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+};
+
+export const createNewExchangeRequest = async (body, token) => {
+  return await client.post("createExchangeRequest", body, {
+    headers: {
+      token,
+    },
+  });
+}
+
+export const cancelRequestExchange = async (body, token) => {
+  try {
+    const response = await client.put(`cancelExchangeRequest`, body, {
+      headers: {
+        token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar el estado del post:', error);
+    throw error;
+  }
+};

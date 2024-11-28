@@ -1,69 +1,114 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  createNewExchangeRequest,
+  getMyPostsToExchange,
+} from "../../services/posts";
+import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 
-const publicaciones = [
-    { id: 1, titulo: "Silla de oficina", imagen: "https://www.quamo.com.ar/3510-thickbox_default/silla-link-negra-neumatica-ecocuero.jpg", tipo: "bien", ofertado: false },
-    { id: 2, titulo: "Clases de pasteleria", imagen: "https://www.bettycrocker.lat/mx/wp-content/uploads/sites/2/2020/12/BCmexico-recipe-pastel-arcoiris.png", tipo: "servicio", ofertado: true },
-    { id: 3, titulo: "Guitarra", imagen: "https://www.heavenimagenes.com/heavencommerce/e11e0483-99c8-4ad2-b3a9-bfb26fc81402/images/v2/YAMAHA/0704121327551540_01_large.jpg", tipo: "bien", ofertado: false },
-    { id: 4, titulo: "Servicio de jardinería", imagen: "https://fiasa.com.ar/wp-content/uploads/2020/11/shutterstock_153976919.jpg", tipo: "servicio", ofertado: false },
-    { id: 5, titulo: "Cámara Instantánea", imagen: "https://http2.mlstatic.com/D_NQ_NP_945164-MLA43951551947_102020-O.webp", tipo: "bien", ofertado: true },
-    { id: 6, titulo: "Clases de guitarra", imagen: "https://images.freeimages.com/images/large-previews/2ee/hands-playing-guitar-1528655.jpg", tipo: "servicio", ofertado: false },
-  ];
-  
+export const SelectPostScreen = () => {
+  const [selected, setSelected] = useState(null);
+  const [auth, setAuth] = useState();
+  const [posts, setPosts] = useState();
+  const [body, setBody] = useState();
 
-export const SelectPostScreen = ({ offerType = "bien" }) => {
-  const [seleccionado, setSeleccionado] = useState(null);
+  const location = useLocation();
+  const { state: post } = location || {};
 
-  // Filtrar y ordenar publicaciones
-  const publicacionesFiltradas = publicaciones
-    .filter(pub => pub.tipo === offerType)
-    .sort((a, b) => {
-      if (a.ofertado === b.ofertado) return 0;
-      return a.ofertado ? 1 : -1;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    const auth = loadFromLocalStorage("auth");
+    setAuth(auth);
+    const isService = post.type !== "Bien";
+
+    const data = await getMyPostsToExchange(
+      auth.user_id,
+      isService,
+      auth.token
+    );
+
+    if (data) {
+      setPosts(data);
+    }
+  };
+
+  const handleSelection = (offering_product_id) => {
+    setSelected(offering_product_id === selected ? null : offering_product_id);
+    setBody({
+      offering_user_id: auth.user_id,
+      requesting_user_id: post.post_creator.user_id,
+      offering_product_id,
+      requesting_product_id: post.product_id,
     });
+  };
 
-  const handleSeleccion = (id) => {
-    setSeleccionado(id === seleccionado ? null : id);
+  const handleSubmit = async () => {
+    try {
+      await createNewExchangeRequest(body, auth.token);
+      navigate("/detailsPost", {
+        state: post.product_id,
+      });
+    } catch (error) {
+      console.log("Error en la creación de solicitud:", error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
       <h1 className="text-3xl font-bold mb-6 text-center text-black">
-        Seleccione uno de sus {offerType === "bien" ? "Bienes" : "Servicios"}
+        Seleccione uno de sus {post.type === "Bien" ? "Bienes" : "Servicios"}
       </h1>
-      
+
       <div className="mb-6 flex justify-between items-center">
         <button
+          onClick={handleSubmit}
           className={`bg-black text-white px-4 py-2 rounded-md ${
-            seleccionado ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'
+            selected
+              ? "opacity-100 cursor-pointer"
+              : "opacity-50 cursor-not-allowed"
           }`}
-          disabled={!seleccionado}
+          disabled={!selected}
         >
           Solicitar Trueque
         </button>
         <p className="text-black">
-          {seleccionado ? "Publicación seleccionada" : "Seleccione una publicación"}
+          {selected ? "Publicación seleccionada" : "Seleccione una publicación"}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {publicacionesFiltradas.map((publicacion) => (
+        {posts?.map((post) => (
           <div
-            key={publicacion.id}
-            className={`${publicacion.ofertado ? "bg-gray-300 opacity-50" : "bg-gray-100" } rounded-lg overflow-hidden shadow-md ${
-              !publicacion.ofertado && 'cursor-pointer hover:shadow-lg transition-shadow duration-300'
-            } ${seleccionado === publicacion.id ? 'ring-2 ring-black' : ''}`}
-            onClick={() => !publicacion.ofertado && handleSeleccion(publicacion.id)}
+            key={post?.product_id}
+            className={`${
+              post.state === "OFFERED"
+                ? "bg-gray-300 opacity-50"
+                : "bg-gray-100"
+            } rounded-lg overflow-hidden shadow-md ${
+              post.state !== "OFFERED" &&
+              "cursor-pointer hover:shadow-lg transition-shadow duration-300"
+            } ${selected === post.product_id ? "ring-2 ring-black" : ""}`}
+            onClick={() =>
+              post.state !== "OFFERED" && handleSelection(post.product_id)
+            }
           >
             <img
-              src={publicacion.imagen}
-              alt={publicacion.titulo}
+              src={post?.images[0]}
+              alt={post?.title}
               className="w-full h-48 object-cover"
             />
             <div className="p-4">
-              <h3 className="font-semibold text-lg mb-2 text-black">{publicacion.titulo}</h3>
-              {publicacion.ofertado && (
+              <h3 className="font-semibold text-lg mb-2 text-black">
+                {post?.title}
+              </h3>
+              {post.state === "OFFERED" && (
                 <span className="bg-gray-900 text-white text-sm py-1 px-2 rounded-full">
-                  Ofertado
+                  Ofrecido para trueque
                 </span>
               )}
             </div>
@@ -72,4 +117,4 @@ export const SelectPostScreen = ({ offerType = "bien" }) => {
       </div>
     </div>
   );
-}
+};

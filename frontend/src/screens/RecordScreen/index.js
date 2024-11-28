@@ -46,6 +46,8 @@ export const RecordScreen = () => {
   const handleStopCaptureClick = useCallback(() => {
     mediaRecorderRef.current.stop();
     setCapturing(false);
+    console.log('entra');
+    
   }, [mediaRecorderRef, setCapturing]);
 
   const handleSaveAsBase64 = useCallback(() => {

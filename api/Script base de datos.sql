@@ -66,9 +66,10 @@ CREATE TABLE Exchanges (
 -- Tabla Product_requests
 CREATE TABLE Product_requests (
     product_requests_id SERIAL PRIMARY KEY,
-    product_id INT NOT NULL REFERENCES Product(product_id),
+    requesting_product_id INT NOT NULL REFERENCES Product(product_id),
     requesting_user_id INT NOT NULL REFERENCES Users(user_id),
     offering_product_id INT NOT NULL REFERENCES Product(product_id),
+    offering_user_id INT NOT NULL REFERENCES Users(user_id),
     status VARCHAR(50) NOT NULL,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP

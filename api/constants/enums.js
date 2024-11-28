@@ -4,3 +4,7 @@ export const PRODUCT_VIDEO = "PRODUCT_VIDEO";
 export const WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL";
 export const APPROVED = "APPROVED";
 export const REJECTED = "REJECTED";
+export const OFFERED = "OFFERED";
+export const PENDING = "PENDING";
+export const PENDING_APPROVAL = "PENDING_APPROVAL"
+export const CANCELED = "CANCELED";
