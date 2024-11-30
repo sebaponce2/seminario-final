@@ -6,11 +6,13 @@ import {
   createRequestExchange,
   createUser,
   getExchangeDetails,
+  getExchangesHistory,
   getPostDescription,
   getPostRequestsList,
   getPostsAdmin,
   getPostsClient,
   getPostsToExchange,
+  getProfileDetails,
   getUserLogin,
   updateExchangeRequestStatus,
   updatePostStatus,
@@ -32,5 +34,7 @@ router.get("/getPostRequestsList", getPostRequestsList);
 router.put("/updateExchangeRequestStatus", updateExchangeRequestStatus);
 router.get("/getExchangeDetails", getExchangeDetails);
 router.put("/confirmExchange", confirmExchange);
+router.get("/getExchangesHistory", getExchangesHistory);
+router.get("/getProfileDetails", getProfileDetails);
 
 export default router;

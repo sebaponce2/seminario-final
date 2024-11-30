@@ -120,11 +120,11 @@ export const updateStatusExchangeRequest = async (body, token) => {
   }
 };
 
-export const getDetailsExchange = async (requesting_product_id, token) => {
+export const getDetailsExchange = async (product_id, token) => {
   return await client
     .get("getExchangeDetails", {
       params: {
-        requesting_product_id,
+        product_id,
       },
       headers: {
         token,
@@ -146,4 +146,18 @@ export const exchangeConfirmation = async (body, token) => {
     console.error("Error al actualizar el estado de confirmación:", error);
     throw error;
   }
+};
+
+export const getHistoryExchanges = async (user_id, token) => {
+  return await client
+    .get("getExchangesHistory", {
+      params: {
+        user_id,
+      },
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
 };

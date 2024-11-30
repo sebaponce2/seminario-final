@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -11,6 +12,7 @@ import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
 import { APPROVED, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
 import { CustomArrow } from "../../componentes/CustomArrow";
+import Loader from "react-js-loader";
 
 export const PostDescriptionScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,6 +20,7 @@ export const PostDescriptionScreen = () => {
   const [auth, setAuth] = useState();
   const [postDescription, setPostDescription] = useState();
   const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const { state: product_id } = location || {};
@@ -49,6 +52,7 @@ export const PostDescriptionScreen = () => {
     if (data) {
       setPostDescription({ ...data, images: [...new Set(data?.images)] });
     }
+    setIsLoading(false);
   };
 
   const openModal = (index) => {
@@ -102,150 +106,158 @@ export const PostDescriptionScreen = () => {
 
   return (
     <div className="min-h-screen bg-[#E5E7EA] p-4 md:p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Carrusel de fotos */}
-        <div className="relative">
-          <Slider {...settings}>
-            {postDescription?.images?.map((image, index) => (
-              <div
-                key={index}
-                className="h-96 cursor-pointer"
-                onClick={() => openModal(index)}
-              >
-                <img
-                  src={`${image}`}
-                  alt={`Foto ${index} de ${postDescription?.title}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </Slider>
+      {/* Mostrar el loader  */}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-[calc(100vh-96px)]">
+          <Loader type="spinner-default" bgColor={"#000"} size={80} />
         </div>
-
-        <div className="p-6">
-          {/* Información de la publicación */}
-          <h1 className="text-3xl font-bold mb-4">{postDescription?.title}</h1>
-
-          <div className="flex items-center mb-4">
-            <img
-              src={postDescription?.post_creator?.profile_picture}
-              alt={`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}
-              className="w-12 h-12 rounded-full mr-4 object-cover"
-            />
-            <div>
-              <p className="font-semibold">{`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}</p>
-              <p className="text-gray-600">{postDescription?.location}</p>
-            </div>
-          </div>
-
-          {auth?.role === SUPER_ADMIN && (
-            <div className="mb-4">
-              <span
-                className={`inline-block px-2 py-1 rounded-full text-sm font-semibold ${
-                  postDescription?.type === "Bien"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-blue-100 text-blue-800"
-                }`}
-              >
-                {postDescription?.type}
-              </span>
-            </div>
-          )}
-
-          {/* Descripción en un cuadro */}
-          <div className="mb-8 p-4 border border-gray-300 rounded-lg shadow-sm">
-            <h2 className="text-xl font-semibold mb-2">Descripción</h2>
-            <p>{postDescription?.description}</p>
-          </div>
-
-          {/* Botones de acción */}
-          {auth?.role === SUPER_ADMIN ? (
-            <div className="flex flex-col gap-4">
-              {postDescription?.type === "Bien" && (
-                <div className=" sm:flex-row gap-4">
-                  <button
-                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
-                    onClick={handleVideoClick}
-                  >
-                    {isVideoVisible ? "Cerrar video" : "Visualizar video"}
-                  </button>
-                  {isVideoVisible && postDescription?.video && (
-                    <div className="mt-4">
-                      <video
-                        controls
-                        className="w-full"
-                        src={postDescription?.video}
-                        alt="Video de publicación"
-                      />
-                    </div>
-                  )}
+      ) : (
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Carrusel de fotos */}
+          <div className="relative">
+            <Slider {...settings}>
+              {postDescription?.images?.map((image, index) => (
+                <div
+                  key={index}
+                  className="h-96 cursor-pointer"
+                  onClick={() => openModal(index)}
+                >
+                  <img
+                    src={`${image}`}
+                    alt={`Foto ${index} de ${postDescription?.title}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              )}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => handleChangePostStatus(true)}
-                  className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition duration-300"
-                >
-                  Aprobar
-                </button>
-                <button
-                  onClick={() => handleChangePostStatus(false)}
-                  className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-300"
-                >
-                  Rechazar
-                </button>
+              ))}
+            </Slider>
+          </div>
+
+          <div className="p-6">
+            {/* Información de la publicación */}
+            <h1 className="text-3xl font-bold mb-4">
+              {postDescription?.title}
+            </h1>
+
+            <div className="flex items-center mb-4">
+              <img
+                src={postDescription?.post_creator?.profile_picture}
+                alt={`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}
+                className="w-12 h-12 rounded-full mr-4 object-cover"
+              />
+              <div>
+                <p className="font-semibold">{`${postDescription?.post_creator?.name} ${postDescription?.post_creator?.last_name}`}</p>
+                <p className="text-gray-600">{postDescription?.location}</p>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4">
-              {auth?.user_id === postDescription?.post_creator?.user_id ? (
-                <button
-                  onClick={() => {
-                    postDescription?.state === APPROVED
-                      ? navigate("/requestsList", {
-                          state: postDescription,
-                        })
-                      : navigate("/barteringDetails", {
-                          state: postDescription,
-                        });
-                  }}
-                  className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+
+            {auth?.role === SUPER_ADMIN && (
+              <div className="mb-4">
+                <span
+                  className={`inline-block px-2 py-1 rounded-full text-sm font-semibold ${
+                    postDescription?.type === "Bien"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
                 >
-                  {postDescription?.state === APPROVED
-                    ? "Ver listado de solicitudes"
-                    : "Ver estado del trueque"}
-                </button>
-              ) : (
-                <>
+                  {postDescription?.type}
+                </span>
+              </div>
+            )}
+
+            {/* Descripción en un cuadro */}
+            <div className="mb-8 p-4 border border-gray-300 rounded-lg shadow-sm">
+              <h2 className="text-xl font-semibold mb-2">Descripción</h2>
+              <p>{postDescription?.description}</p>
+            </div>
+
+            {/* Botones de acción */}
+            {auth?.role === SUPER_ADMIN ? (
+              <div className="flex flex-col gap-4">
+                {postDescription?.type === "Bien" && (
+                  <div className=" sm:flex-row gap-4">
+                    <button
+                      className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                      onClick={handleVideoClick}
+                    >
+                      {isVideoVisible ? "Cerrar video" : "Visualizar video"}
+                    </button>
+                    {isVideoVisible && postDescription?.video && (
+                      <div className="mt-4">
+                        <video
+                          controls
+                          className="w-full"
+                          src={postDescription?.video}
+                          alt="Video de publicación"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
-                    onClick={() => navigate("/chats")}
-                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                    onClick={() => handleChangePostStatus(true)}
+                    className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition duration-300"
                   >
-                    Enviar un mensaje
+                    Aprobar
                   </button>
+                  <button
+                    onClick={() => handleChangePostStatus(false)}
+                    className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-300"
+                  >
+                    Rechazar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4">
+                {auth?.user_id === postDescription?.post_creator?.user_id ? (
                   <button
                     onClick={() => {
-                      postDescription?.user_post_status === PENDING_APPROVAL
-                        ? handleCancelExchangeRequest()
-                        : navigate("/selectPost", { state: postDescription });
+                      postDescription?.state === APPROVED
+                        ? navigate("/requestsList", {
+                            state: postDescription,
+                          })
+                        : navigate("/barteringDetails", {
+                            state: postDescription,
+                          });
                     }}
-                    className={`${
-                      postDescription?.user_post_status === PENDING_APPROVAL
-                        ? "bg-red-800 hover:bg-red-700"
-                        : "bg-black hover:bg-gray-800"
-                    } text-white px-6 py-2 rounded-md transition duration-300`}
+                    className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
                   >
-                    {postDescription?.user_post_status === PENDING_APPROVAL
-                      ? "Cancelar solicitud"
-                      : "Solicitar trueque"}
+                    {postDescription?.state === APPROVED
+                      ? "Ver listado de solicitudes"
+                      : "Ver estado del trueque"}
                   </button>
-                </>
-              )}
-            </div>
-          )}
+                ) : (
+                  <>
+                    <button
+                      onClick={() => navigate("/chats")}
+                      className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
+                    >
+                      Enviar un mensaje
+                    </button>
+                    <button
+                      onClick={() => {
+                        postDescription?.user_post_status === PENDING_APPROVAL
+                          ? handleCancelExchangeRequest()
+                          : navigate("/selectPost", { state: postDescription });
+                      }}
+                      className={`${
+                        postDescription?.user_post_status === PENDING_APPROVAL
+                          ? "bg-red-800 hover:bg-red-700"
+                          : "bg-black hover:bg-gray-800"
+                      } text-white px-6 py-2 rounded-md transition duration-300`}
+                    >
+                      {postDescription?.user_post_status === PENDING_APPROVAL
+                        ? "Cancelar solicitud"
+                        : "Solicitar trueque"}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
+      )}
       {/* Modal */}
       {isModalOpen && (
         <div

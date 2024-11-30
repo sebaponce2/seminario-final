@@ -579,11 +579,16 @@ export async function updateExchangeRequestStatus(req, res) {
 }
 
 export async function getExchangeDetails(req, res) {
-  const { requesting_product_id } = req.query;
+  const { product_id } = req.query;
 
   try {
     const exchange = await Exchanges.findOne({
-      where: { requesting_product_id: requesting_product_id },
+      where: {
+        [Op.or]: [
+          { requesting_product_id: product_id },
+          { offering_product_id: product_id },
+        ],
+      },
     });
 
     if (!exchange) {
@@ -596,6 +601,7 @@ export async function getExchangeDetails(req, res) {
       offering_user_id,
       requesting_user_id,
       offering_product_id,
+      requesting_product_id,
       status_offering_user,
       status_requesting_user,
       status,
@@ -712,7 +718,7 @@ export async function confirmExchange(req, res) {
     });
 
     // Verificar si ambos estados están confirmados
-    const exchange = await Exchanges.findOne({ where: { exchange_id } });
+    let exchange = await Exchanges.findOne({ where: { exchange_id } });
 
     if (
       exchange.status_offering_user === CONFIRMED_USER_EXCHANGE &&
@@ -724,13 +730,115 @@ export async function confirmExchange(req, res) {
       );
     }
 
-    res
-      .status(200)
-      .json({ message: "Estado de confirmación actualizado con éxito." });
+    exchange = await Exchanges.findOne({ where: { exchange_id } });
+
+    const { status, status_offering_user, status_requesting_user } =
+      exchange.dataValues;
+
+    const response = {
+      status,
+      status_offering_user,
+      status_requesting_user,
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error al modificar el estado de confirmación:", error);
     res
       .status(400)
       .json({ message: "Error al modificar el estado de confirmación." });
+  }
+}
+
+export async function getExchangesHistory(req, res) {
+  const { user_id } = req.query;
+
+  try {
+    const exchanges = await Exchanges.findAll({
+      where: {
+        [Op.or]: [
+          { requesting_user_id: user_id },
+          { offering_user_id: user_id },
+        ],
+      },
+    });
+
+    // Helper function to fetch and structure user and product data
+    const getProductData = async (productId) => {
+      const product = await Product.findOne({
+        where: { product_id: productId },
+      });
+      const productImages = await MultimediaStorage.findAll({
+        where: { product_id: productId, type: PRODUCT_IMAGE },
+      });
+
+      return {
+        product_to_get: {
+          id: product?.dataValues?.product_id,
+          title: product?.dataValues?.title,
+          images: productImages.map((image) => image.value),
+        },
+      };
+    };
+
+    const response = await Promise.all(
+      exchanges.map(async (exchange) => {
+        if (Number(user_id) === exchange.dataValues.requesting_user_id) {
+          return {
+            ...(await getProductData(exchange.dataValues.offering_product_id)),
+            status: exchange.dataValues.status,
+          };
+        } else if (Number(user_id) === exchange.dataValues.offering_user_id) {
+          return {
+            ...(await getProductData(
+              exchange.dataValues.requesting_product_id
+            )),
+            status: exchange.dataValues.status,
+          };
+        }
+        return null;
+      })
+    );
+
+    res.status(200).json(response.filter(Boolean)); // Filtra valores nulos
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al recuperar el historial de trueques",
+      error: error.message,
+    });
+  }
+}
+
+export async function getProfileDetails(req, res) {
+  const token = req.headers.token;
+  const user = await admin.auth().verifyIdToken(token);
+  const { uid } = user;
+
+  try {
+    const user = await Users.findOne({ where: { uid } });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const multimedia = await MultimediaStorage.findOne({
+      where: { user_id: user.dataValues.user_id },
+      attributes: ["value"],
+    });
+
+    const { name, last_name, email, age, phone } = user.dataValues;
+
+    const response = {
+      profile_picture: multimedia?.value || null,
+      name,
+      last_name,
+      email,
+      age,
+      phone,
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ message: "Error al recuperar el usuario", error });
   }
 }

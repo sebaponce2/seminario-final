@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { SUPER_ADMIN } from "../../constants/enums";
 
@@ -23,6 +23,8 @@ export const Navbar = () => {
     const auth = await loadFromLocalStorage("auth");
     setUser(auth);
   };
+
+  const navigate = useNavigate();
 
   const AdminNav = () => (
     <div
@@ -141,7 +143,12 @@ export const Navbar = () => {
             </a>
             <a
               href="#"
-              onClick={toggleDropdown}
+              onClick={() => {
+                navigate("/barteringHistory", {
+                  state: user?.user_id,
+                });
+                toggleDropdown();
+              }}
               className="block px-4 py-2 hover:bg-gray-100"
             >
               Historial de trueques

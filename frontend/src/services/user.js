@@ -21,3 +21,15 @@ export const getUserLogin = async (uid, token) => {
     .then((response) => response.data)
     .catch((error) => console.error(error));
 };
+
+
+export const getUserProfile = async (token) => {
+  return await client
+    .get("getProfileDetails", {
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+};
