@@ -533,26 +533,27 @@ export async function updateExchangeRequestStatus(req, res) {
         where: { product_requests_id: product_requests_id },
       });
 
-      const product_id = request.dataValues.requesting_product_id;
+      const requesting_product_id = request.dataValues.requesting_product_id;
+      const offering_product_id = request.dataValues.offering_product_id;
 
-      const [productUpdated] = await Product.update(
+      const [productsUpdated] = await Product.update(
         { state: EXCHANGE_IN_PROGRESS },
         {
-          where: { product_id: product_id },
+          where: {
+            [Op.or]: [
+              { product_id: requesting_product_id },
+              { product_id: offering_product_id },
+            ],
+          },
         }
       );
 
-      if (!productUpdated) {
+      if (!productsUpdated) {
         return res
           .status(400)
           .json({ message: "No se pudo actualizar el estado del producto." });
       }
-      const {
-        requesting_product_id,
-        requesting_user_id,
-        offering_product_id,
-        offering_user_id,
-      } = request?.dataValues;
+      const { requesting_user_id, offering_user_id } = request?.dataValues;
 
       const bodyExchange = {
         offering_user_id,

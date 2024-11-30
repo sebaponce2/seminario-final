@@ -53,7 +53,7 @@ export const PostRequestsList = () => {
       setRequestsList(data);
     }
 
-    setIsLoading(false); 
+    setIsLoading(false);
   };
 
   const handleChangeState = async (product_requests_id, newStatus) => {
@@ -84,12 +84,12 @@ export const PostRequestsList = () => {
 
   return (
     <div className="min-h-screen bg-[#E5E7EA] flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-        {isLoading ? ( 
-          <div className="flex justify-center items-center h-[calc(100vh-96px)]">
-            <Loader type="spinner-default" bgColor={"#000"} size={80} />
-          </div>
-        ) : (
+      {isLoading ? (
+        <div className="flex justify-center items-center h-[calc(100vh-96px)]">
+          <Loader type="spinner-default" bgColor={"#000"} size={80} />
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
           <>
             <h1 className="text-2xl font-bold mb-6 text-center">
               Solicitudes de Trueque
@@ -159,8 +159,8 @@ export const PostRequestsList = () => {
               ))}
             </ul>
           </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
