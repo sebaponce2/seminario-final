@@ -1,8 +1,8 @@
 ## **README: Proyecto Seminario Final**
 
-### **Descarga de Archivos**
+### **Drive de Archivos necesarios y Demo**
 
-Para comenzar, descargá todos los archivos necesarios desde el siguiente enlace: 
+En este drive encontraremos los archivos necesarios para la configuración del proyecto, y el video de la Demo: 
 [https://drive.google.com/drive/folders/1PNeOlvwKMRPMaMokPXEoaEP8IloX-OTm?usp=drive_link](https://drive.google.com/drive/folders/1PNeOlvwKMRPMaMokPXEoaEP8IloX-OTm?usp=drive_link)
 
 ### **Clonación del Proyecto**
