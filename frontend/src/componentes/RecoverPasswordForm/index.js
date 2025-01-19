@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { FirebaseAuth } from "../../plugins/firebase";
 
 const RecoverPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +14,7 @@ const RecoverPasswordForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isValidEmail) {
+      sendPasswordResetEmail(FirebaseAuth, email);
       setMessage("Se te ha enviado un mail para reestablecer tu contraseña.");
     }
   };
