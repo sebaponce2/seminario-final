@@ -8,6 +8,7 @@ import {
   getCategories,
   getExchangeDetails,
   getExchangesHistory,
+  getMyPosts,
   getPostDescription,
   getPostRequestsList,
   getPostsAdmin,
@@ -40,5 +41,6 @@ router.get("/getExchangeDetails", getExchangeDetails);
 router.put("/confirmExchange", confirmExchange);
 router.get("/getExchangesHistory", getExchangesHistory);
 router.get("/getProfileDetails", getProfileDetails);
+router.get("/getMyPosts", getMyPosts);
 
 export default router;

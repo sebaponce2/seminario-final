@@ -9,18 +9,18 @@ export const getProvincesClient = async (token) => {
     })
     .then((response) => response.data)
     .catch((error) => console.error(error));
-}
+};
 
 export const getCategoriesClient = async (token) => {
   return await client
     .get("getCategories", {
       headers: {
         token,
-      }
+      },
     })
     .then((response) => response.data)
     .catch((error) => console.error(error));
-}
+};
 
 export const createNewPost = async (body, token) => {
   return await client.post("createPost", body, {
@@ -171,15 +171,30 @@ export const exchangeConfirmation = async (body, token) => {
 };
 
 export const getHistoryExchanges = async (user_id, token) => {
-  return await client
-    .get("getExchangesHistory", {
+  try {
+    const response = await client.get("getExchangesHistory", {
       params: {
         user_id,
       },
       headers: {
         token,
       },
-    })
-    .then((response) => response.data)
-    .catch((error) => console.error(error));
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error al obtener el historial de trueques:", error);
+  }
+};
+
+export const getMyPostsClient = async (token) => {
+  try {
+    const response = await client.get("getMyPosts", {
+      headers: {
+        token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error al obtener mis publicaciones:", error);
+  }
 };

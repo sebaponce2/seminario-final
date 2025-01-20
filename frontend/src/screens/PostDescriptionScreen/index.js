@@ -10,7 +10,7 @@ import {
 } from "../../services/posts";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
-import { APPROVED, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
+import { EXCHANGE_COMPLETED, EXCHANGE_IN_PROGRESS, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
 import { CustomArrow } from "../../componentes/CustomArrow";
 import Loader from "react-js-loader";
 
@@ -213,7 +213,7 @@ export const PostDescriptionScreen = () => {
                 {auth?.user_id === postDescription?.post_creator?.user_id ? (
                   <button
                     onClick={() => {
-                      postDescription?.state === APPROVED
+                      postDescription?.state !== EXCHANGE_IN_PROGRESS && postDescription?.state !== EXCHANGE_COMPLETED
                         ? navigate("/requestsList", {
                             state: postDescription,
                           })
@@ -223,7 +223,7 @@ export const PostDescriptionScreen = () => {
                     }}
                     className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
                   >
-                    {postDescription?.state === APPROVED
+                    {postDescription?.state !== EXCHANGE_IN_PROGRESS && postDescription?.state !== EXCHANGE_COMPLETED
                       ? "Ver listado de solicitudes"
                       : "Ver estado del trueque"}
                   </button>

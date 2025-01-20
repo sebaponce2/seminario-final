@@ -135,7 +135,7 @@ export const HomeScreen = () => {
                 >
                   <option value="">Todas las provincias</option>
                   {provinces.map((prov) => (
-                    <option key={prov.id} value={prov.name}>
+                    <option key={prov.location_id} value={prov.name}>
                       {prov.name}
                     </option>
                   ))}

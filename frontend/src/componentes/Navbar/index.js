@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -134,13 +135,13 @@ export const Navbar = () => {
             >
               Mi perfil
             </Link>
-            <a
-              href="#"
+            <Link
+              to="/myPosts"
               onClick={toggleDropdown}
               className="block px-4 py-2 hover:bg-gray-100"
             >
               Mis publicaciones
-            </a>
+            </Link>
             <a
               href="#"
               onClick={() => {
@@ -235,12 +236,16 @@ export const Navbar = () => {
             <Link onClick={toggleMenu} to="/profile" className="block py-2">
               Datos personales
             </Link>
-            <a href="#" className="block py-2">
+            <Link onClick={toggleMenu} to="/myPosts" className="block py-2">
               Mis publicaciones
-            </a>
-            <a href="#" className="block py-2">
+            </Link>
+            <Link
+              onClick={toggleMenu}
+              to="/barteringHistory"
+              className="block py-2"
+            >
               Historial de trueques
-            </a>
+            </Link>
             <Link onClick={toggleMenu} to="/login" className="block py-2">
               Cerrar sesión
             </Link>

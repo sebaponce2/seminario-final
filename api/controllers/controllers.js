@@ -749,6 +749,18 @@ export async function confirmExchange(req, res) {
         { status: EXCHANGE_COMPLETED },
         { where: { exchange_id } }
       );
+
+      await Product.update(
+        { state: EXCHANGE_COMPLETED },
+        {
+          where: {
+            [Op.or]: [
+              { product_id: exchange.offering_product_id },
+              { product_id: exchange.requesting_product_id },
+            ],
+          },
+        }
+      );
     }
 
     exchange = await Exchanges.findOne({ where: { exchange_id } });
@@ -861,5 +873,48 @@ export async function getProfileDetails(req, res) {
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: "Error al recuperar el usuario", error });
+  }
+}
+
+export const getMyPosts = async (req, res) => {
+  const token = req.headers.token;
+  const user = await admin.auth().verifyIdToken(token);
+  const { uid } = user;
+
+  try {
+    const findUser = await Users.findOne({ where: { uid } });
+
+    const user = findUser.dataValues;
+
+    const products = await Product.findAll({
+      where: { user_id: user.user_id },
+    });
+
+    const response = await Promise.all(
+      products.map(async (product) => {
+        const multimedia = await MultimediaStorage.findAll({
+          where: { product_id: product.product_id, type: PRODUCT_IMAGE },
+        });
+
+        const images = multimedia.map((media) => media.value);
+
+        const category = await Category.findOne({
+          where: { category_id: product.category_id },
+          attributes: ["name"],
+        });
+
+        return {
+          ...product.toJSON(),
+          images,
+          category: category.name,
+        };
+      })
+    );
+
+    res.status(200).json(response);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error al recuperar las publicaciones", error });
   }
 }
