@@ -1,5 +1,27 @@
 import { client } from "./client";
 
+export const getProvincesClient = async (token) => {
+  return await client
+    .get("getProvinces", {
+      headers: {
+        token,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+}
+
+export const getCategoriesClient = async (token) => {
+  return await client
+    .get("getCategories", {
+      headers: {
+        token,
+      }
+    })
+    .then((response) => response.data)
+    .catch((error) => console.error(error));
+}
+
 export const createNewPost = async (body, token) => {
   return await client.post("createPost", body, {
     headers: {

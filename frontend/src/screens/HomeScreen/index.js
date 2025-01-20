@@ -2,50 +2,19 @@
 import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
-import { getPostsUserClient } from "../../services/posts";
+import {
+  getCategoriesClient,
+  getPostsUserClient,
+  getProvincesClient,
+} from "../../services/posts";
 import { useNavigate } from "react-router-dom";
 import Loader from "react-js-loader";
 
-const categories = [
-  "Muebles",
-  "Ropa",
-  "Autos",
-  "Servicios",
-  "Electrodomésticos",
-  "Juguetes",
-  "Construcción",
-  "Salud",
-  "Higiene",
-];
-
-const provinces = [
-  "Buenos Aires",
-  "Catamarca",
-  "Chaco",
-  "Chubut",
-  "Córdoba",
-  "Corrientes",
-  "Entre Ríos",
-  "Formosa",
-  "Jujuy",
-  "La Pampa",
-  "La Rioja",
-  "Mendoza",
-  "Misiones",
-  "Neuquén",
-  "Río Negro",
-  "Salta",
-  "San Juan",
-  "San Luis",
-  "Santa Cruz",
-  "Santa Fe",
-  "Santiago del Estero",
-  "Tierra del Fuego",
-  "Tucumán",
-];
-
 export const HomeScreen = () => {
+  const [provinces, setProvinces] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,32 +23,53 @@ export const HomeScreen = () => {
   const filteredProducts = posts.filter((post) => {
     const matchesProvince =
       selectedProvince === "" || post.location === selectedProvince;
+    const matchesCategory =
+      selectedCategory === "" || post.category === selectedCategory;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesProvince && matchesSearch;
+    return matchesProvince && matchesSearch && matchesCategory;
   });
 
   useEffect(() => {
     getData();
+    getProvinces();
+    getCategories();
   }, []);
 
   const getData = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     const { token } = loadFromLocalStorage("auth");
-
     const data = await getPostsUserClient(token);
 
     if (data) {
       setPosts(data);
     }
-    setIsLoading(false); 
+    setIsLoading(false);
+  };
+
+  const getProvinces = async () => {
+    const { token } = loadFromLocalStorage("auth");
+    const data = await getProvincesClient(token);
+
+    if (data) {
+      setProvinces(data);
+    }
+  };
+
+  const getCategories = async () => {
+    const { token } = loadFromLocalStorage("auth");
+    const data = await getCategoriesClient(token);
+
+    if (data) {
+      setCategories(data);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <div className="container mx-auto px-4 py-8">
-        {isLoading ? ( 
+        {isLoading ? (
           <div className="flex justify-center items-center h-[calc(100vh-96px)]">
             <Loader type="spinner-default" bgColor={"#000"} size={80} />
           </div>
@@ -89,14 +79,34 @@ export const HomeScreen = () => {
             <aside className="w-full md:w-64">
               <h2 className="text-2xl font-bold mb-6">Categorías</h2>
               <nav>
+                <ul className="mb-3">
+                  <li key="">
+                    <a
+                      href="#"
+                      onClick={() => setSelectedCategory("")}
+                      className={`${
+                        selectedCategory === ""
+                          ? "text-black font-bold"
+                          : "text-gray-600 font-medium"
+                      } hover:text-gray-900 transition-colors`}
+                    >
+                      Todas las categorías
+                    </a>
+                  </li>
+                </ul>
                 <ul className="space-y-3">
-                  {categories.map((category, index) => (
-                    <li key={index}>
+                  {categories.map((category) => (
+                    <li key={category.category_id}>
                       <a
                         href="#"
-                        className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                        onClick={() => setSelectedCategory(category.name)}
+                        className={`${
+                          selectedCategory === category.name
+                            ? "text-black font-bold"
+                            : "text-gray-600 font-medium"
+                        } hover:text-gray-900 transition-colors`}
                       >
-                        {category}
+                        {category.name}
                       </a>
                     </li>
                   ))}
@@ -124,9 +134,9 @@ export const HomeScreen = () => {
                   className="px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white"
                 >
                   <option value="">Todas las provincias</option>
-                  {provinces.map((location, index) => (
-                    <option key={index} value={location}>
-                      {location}
+                  {provinces.map((prov) => (
+                    <option key={prov.id} value={prov.name}>
+                      {prov.name}
                     </option>
                   ))}
                 </select>

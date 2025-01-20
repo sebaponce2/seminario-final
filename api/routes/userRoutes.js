@@ -5,6 +5,7 @@ import {
   createPost,
   createRequestExchange,
   createUser,
+  getCategories,
   getExchangeDetails,
   getExchangesHistory,
   getPostDescription,
@@ -13,6 +14,7 @@ import {
   getPostsClient,
   getPostsToExchange,
   getProfileDetails,
+  getProvinces,
   getUserLogin,
   updateExchangeRequestStatus,
   updatePostStatus,
@@ -22,6 +24,8 @@ const router = Router();
 
 router.post("/register", createUser);
 router.get("/login", getUserLogin);
+router.get("/getProvinces", getProvinces);
+router.get("/getCategories", getCategories);
 router.post("/createPost", createPost);
 router.get("/getPostsClient", getPostsClient);
 router.get("/getPostsAdmin", getPostsAdmin);

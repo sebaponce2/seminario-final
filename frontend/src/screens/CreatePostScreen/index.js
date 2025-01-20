@@ -1,51 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { loadFromLocalStorage, saveToLocalStorage } from "../../hooks/useLocaleStorage";
-import { createNewPost } from "../../services/posts";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+} from "../../hooks/useLocaleStorage";
+import { createNewPost, getCategoriesClient, getProvincesClient } from "../../services/posts";
 import { SuccessPostModal } from "../../componentes/SuccessPostModal";
-
-const provinciasArgentina = [
-  { id: 1, value: "Buenos Aires" },
-  { id: 2, value: "Catamarca" },
-  { id: 3, value: "Chaco" },
-  { id: 4, value: "Chubut" },
-  { id: 5, value: "Córdoba" },
-  { id: 6, value: "Corrientes" },
-  { id: 7, value: "Entre Ríos" },
-  { id: 8, value: "Formosa" },
-  { id: 9, value: "Jujuy" },
-  { id: 10, value: "La Pampa" },
-  { id: 11, value: "La Rioja" },
-  { id: 12, value: "Mendoza" },
-  { id: 13, value: "Misiones" },
-  { id: 14, value: "Neuquén" },
-  { id: 15, value: "Río Negro" },
-  { id: 16, value: "Salta" },
-  { id: 17, value: "San Juan" },
-  { id: 18, value: "San Luis" },
-  { id: 19, value: "Santa Cruz" },
-  { id: 20, value: "Santa Fe" },
-  { id: 21, value: "Santiago del Estero" },
-  { id: 22, value: "Tierra del Fuego" },
-  { id: 23, value: "Tucumán" },
-];
 
 export const CreatePostScreen = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location_id: "",
+    category_id:"",
     images: [],
   });
-
+  const [provinces, setProvinces] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isService = searchParams.get("isService") === "true";
 
+  useEffect(() => {
+    getProvinces();
+    getCategories();
+  },[]);
+
+  const getProvinces = async () => {
+    const { token } = loadFromLocalStorage("auth");
+    const data = await getProvincesClient(token);
+
+    if (data) {
+      setProvinces(data);
+    }
+  };
+
+  const getCategories = async () => {
+      const { token } = loadFromLocalStorage("auth");
+      const data = await getCategoriesClient(token);
+  
+      if (data) {
+        setCategories(data);
+      }
+    }
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
@@ -84,23 +87,23 @@ export const CreatePostScreen = () => {
     formData.title &&
     formData.description &&
     formData.location_id &&
+    formData.category_id &&
     formData.images.length > 0;
 
   const handleSubmit = async () => {
     if (isFormValid) {
       const { user_id, token } = await loadFromLocalStorage("auth");
-      
+
       const body = {
         ...formData,
         user_id,
         isService,
-        category_id: isService ? 4 : 1,
       };
 
       if (isService) {
         try {
           const response = await createNewPost(body, token);
-          
+
           if (response) {
             setIsSubmitted(true);
           }
@@ -211,6 +214,28 @@ export const CreatePostScreen = () => {
             className="block mb-2 text-sm font-medium text-black"
             htmlFor="provincia"
           >
+            Categoría
+          </label>
+          <select
+            id="category_id"
+            value={formData.category_id}
+            onChange={handleInputChange}
+            className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            required
+          >
+            <option key="" value="">Selecciona una categoría</option>
+            {categories.map((category) => (
+              <option key={category.category_id} value={category.category_id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-6">
+          <label
+            className="block mb-2 text-sm font-medium text-black"
+            htmlFor="provincia"
+          >
             Provincia
           </label>
           <select
@@ -220,10 +245,10 @@ export const CreatePostScreen = () => {
             className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
           >
-            <option value="">Selecciona una provincia</option>
-            {provinciasArgentina.map((prov) => (
-              <option key={prov.id} value={prov.id}>
-                {prov.value}
+            <option key="" value="">Selecciona una provincia</option>
+            {provinces.map((prov) => (
+              <option key={prov.location_id} value={prov.location_id}>
+                {prov.name}
               </option>
             ))}
           </select>

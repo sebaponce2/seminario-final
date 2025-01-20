@@ -9,7 +9,7 @@ import Loader from "react-js-loader";
 export const MyBarteringHistory = () => {
   const navigate = useNavigate();
   const [exchanges, setExchanges] = useState();
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const { state: user_id } = location || {};
@@ -20,18 +20,18 @@ export const MyBarteringHistory = () => {
 
   const getData = async () => {
     try {
-      setIsLoading(true); 
-      const auth = await loadFromLocalStorage("auth");
-      const data = await getHistoryExchanges(user_id, auth?.token);
+      setIsLoading(true);
+      const { user_id, token } = await loadFromLocalStorage("auth");
+      const data = await getHistoryExchanges(user_id, token);
       setExchanges(data);
     } catch (error) {
       console.log("Error al obtener el historial de trueques.", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
-  return isLoading ? ( 
+  return isLoading ? (
     <div className="flex justify-center items-center h-[calc(100vh-96px)]">
       <Loader type="spinner-default" bgColor={"#000"} size={80} />
     </div>

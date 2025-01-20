@@ -77,14 +77,14 @@ export const MyChatsScreen = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
+    <div style={{ height: 'calc(100vh - 72px)' }} className="flex bg-white">
       {/* Lista de conversaciones */}
-      <div className={`w-full md:w-1/3 border-r ${showChatOnMobile ? 'hidden md:block' : 'block'}`}>
+      <div className={`w-full md:w-1/4 border-r ${showChatOnMobile ? 'hidden md:block' : 'block'}`}>
         <div className="p-4 border-b">
           <h1 className="text-xl font-bold text-black">Chats</h1>
         </div>
-        <div className="overflow-y-auto h-[calc(100vh-73px)]">
-          {conversations.length === 0 ? (
+        <div className="overflow-y-hidden">
+          {conversations.length === 0 ? ( 
             <div className="h-full flex items-center justify-center text-gray-500">
               No tienes conversaciones
             </div>
@@ -93,14 +93,14 @@ export const MyChatsScreen = () => {
               <div
                 key={chat.id}
                 onClick={() => handleChatSelect(chat)}
-                className={`flex items-center p-4 border-b cursor-pointer hover:bg-gray-50 ${selectedChat?.id === chat.id ? 'bg-gray-200' : ''}`}
+                className={`flex items-center p-4 border-b cursor-pointer hover:bg-gray-50 overflow-y-hidden ${selectedChat?.id === chat.id ? 'bg-gray-200' : ''}`}
               >
                 <img
                   src={chat.avatar}
                   alt={chat.name}
                   className="w-10 h-10 rounded-full"
                 />
-                <div className="ml-3 flex-1">
+                <div className="ml-3 flex-1 overflow-x-hidden">
                   <div className="flex items-center justify-between">
                     <h2 className="font-semibold text-black">{chat.name}</h2>
                     {chat.unread && (
@@ -109,7 +109,7 @@ export const MyChatsScreen = () => {
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 text-sm truncate">{chat.lastMessage}</p>
+                  <p className="text-gray-600 text-sm truncate w-full overflow-hidden whitespace-nowrap">{chat.lastMessage}</p>
                 </div>
               </div>
             ))

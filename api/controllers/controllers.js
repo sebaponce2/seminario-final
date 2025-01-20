@@ -129,6 +129,26 @@ export async function createPost(req, res) {
   }
 }
 
+export async function getProvinces(req, res) {
+  try {
+    const provinces = await Location.findAll();
+
+    res.status(200).json(provinces);
+  } catch (error) {
+    res.status(500).json({ message: "Error al recuperar las provincias" });
+  }
+}
+
+export async function getCategories(req, res) {
+  try {
+    const categories = await Category.findAll();
+
+    res.status(200).json(categories);
+  } catch (error) {
+    res.status(500).json({ message: "Error al recuperar las categorías" });
+  }
+}
+
 export async function getPostsClient(req, res) {
   try {
     // Obtener productos cuyo estado sea APPROVED
