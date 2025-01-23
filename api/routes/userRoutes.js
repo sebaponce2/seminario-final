@@ -2,10 +2,13 @@ import { Router } from "express";
 import {
   cancelExchangeRequest,
   confirmExchange,
+  createNewMessage,
   createPost,
   createRequestExchange,
   createUser,
   getCategories,
+  getChatMessages,
+  getChatsList,
   getExchangeDetails,
   getExchangesHistory,
   getMyPosts,
@@ -19,6 +22,7 @@ import {
   getUserLogin,
   updateExchangeRequestStatus,
   updatePostStatus,
+  validateChat,
 } from "../controllers/controllers.js";
 
 const router = Router();
@@ -42,5 +46,9 @@ router.put("/confirmExchange", confirmExchange);
 router.get("/getExchangesHistory", getExchangesHistory);
 router.get("/getProfileDetails", getProfileDetails);
 router.get("/getMyPosts", getMyPosts);
+router.get("/getChatsList", getChatsList);
+router.get("/validateChat", validateChat);
+router.get("/getChatMessages", getChatMessages);
+router.post("/createNewMessage", createNewMessage);
 
 export default router;

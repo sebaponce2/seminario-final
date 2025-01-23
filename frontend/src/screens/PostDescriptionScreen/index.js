@@ -13,6 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { EXCHANGE_COMPLETED, EXCHANGE_IN_PROGRESS, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
 import { CustomArrow } from "../../componentes/CustomArrow";
 import Loader from "react-js-loader";
+import { validateChatClient } from "../../services/chats";
 
 export const PostDescriptionScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,6 +104,18 @@ export const PostDescriptionScreen = () => {
       console.log("Error al cancelar trueque.");
     }
   };
+
+  const handleSendMessage = async () => {
+    try {
+      const data = await validateChatClient(auth.token, auth.user_id, postDescription?.post_creator?.user_id);
+      if (data) {
+        navigate("/chats", { state: data.chat_id });
+      }
+    } catch (error) {
+      console.log('Error al enviar mensaje:', error);
+      
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#E5E7EA] p-4 md:p-8">
@@ -230,7 +243,7 @@ export const PostDescriptionScreen = () => {
                 ) : (
                   <>
                     <button
-                      onClick={() => navigate("/chats")}
+                      onClick={handleSendMessage}
                       className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
                     >
                       Enviar un mensaje

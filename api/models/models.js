@@ -365,6 +365,7 @@ export const Chat = sequelize.define(
   }
 );
 
+
 // Modelo Message
 export const Message = sequelize.define(
   "message",
@@ -403,3 +404,6 @@ export const Message = sequelize.define(
     timestamps: false,
   }
 );
+
+Chat.hasMany(Message, { foreignKey: 'chat_id' });
+Message.belongsTo(Chat, { foreignKey: 'chat_id' });
