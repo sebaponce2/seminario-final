@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {
@@ -10,14 +9,17 @@ import {
 } from "../../services/posts";
 import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
-import { EXCHANGE_COMPLETED, EXCHANGE_IN_PROGRESS, PENDING_APPROVAL, SUPER_ADMIN } from "../../constants/enums";
-import { CustomArrow } from "../../componentes/CustomArrow";
+import {
+  EXCHANGE_COMPLETED,
+  EXCHANGE_IN_PROGRESS,
+  PENDING_APPROVAL,
+  SUPER_ADMIN,
+} from "../../constants/enums";
 import Loader from "react-js-loader";
 import { validateChatClient } from "../../services/chats";
+import ImageCarousel from "../../componentes/Carousel/Carousel";
 
 export const PostDescriptionScreen = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [auth, setAuth] = useState();
   const [postDescription, setPostDescription] = useState();
   const [isVideoVisible, setIsVideoVisible] = useState(false);
@@ -27,17 +29,6 @@ export const PostDescriptionScreen = () => {
   const { state: product_id } = location || {};
 
   const navigate = useNavigate();
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    adaptiveHeight: false,
-    nextArrow: <CustomArrow direction="right" />,
-    prevArrow: <CustomArrow direction="left" />,
-  };
 
   useEffect(() => {
     if (product_id) {
@@ -54,21 +45,6 @@ export const PostDescriptionScreen = () => {
       setPostDescription({ ...data, images: [...new Set(data?.images)] });
     }
     setIsLoading(false);
-  };
-
-  const openModal = (index) => {
-    setSelectedImageIndex(index);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleModalClick = (e) => {
-    if (e.target.id === "modal-overlay") {
-      closeModal();
-    }
   };
 
   const handleVideoClick = () => {
@@ -107,15 +83,18 @@ export const PostDescriptionScreen = () => {
 
   const handleSendMessage = async () => {
     try {
-      const data = await validateChatClient(auth.token, auth.user_id, postDescription?.post_creator?.user_id);
+      const data = await validateChatClient(
+        auth.token,
+        auth.user_id,
+        postDescription?.post_creator?.user_id
+      );
       if (data) {
         navigate("/chats", { state: data.chat_id });
       }
     } catch (error) {
-      console.log('Error al enviar mensaje:', error);
-      
+      console.log("Error al enviar mensaje:", error);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#E5E7EA] p-4 md:p-8">
@@ -128,21 +107,7 @@ export const PostDescriptionScreen = () => {
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Carrusel de fotos */}
           <div className="relative">
-            <Slider {...settings}>
-              {postDescription?.images?.map((image, index) => (
-                <div
-                  key={index}
-                  className="h-96 cursor-pointer"
-                  onClick={() => openModal(index)}
-                >
-                  <img
-                    src={`${image}`}
-                    alt={`Foto ${index} de ${postDescription?.title}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </Slider>
+            <ImageCarousel images={postDescription?.images} />
           </div>
 
           <div className="p-6">
@@ -226,7 +191,8 @@ export const PostDescriptionScreen = () => {
                 {auth?.user_id === postDescription?.post_creator?.user_id ? (
                   <button
                     onClick={() => {
-                      postDescription?.state !== EXCHANGE_IN_PROGRESS && postDescription?.state !== EXCHANGE_COMPLETED
+                      postDescription?.state !== EXCHANGE_IN_PROGRESS &&
+                      postDescription?.state !== EXCHANGE_COMPLETED
                         ? navigate("/requestsList", {
                             state: postDescription,
                           })
@@ -236,7 +202,8 @@ export const PostDescriptionScreen = () => {
                     }}
                     className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
                   >
-                    {postDescription?.state !== EXCHANGE_IN_PROGRESS && postDescription?.state !== EXCHANGE_COMPLETED
+                    {postDescription?.state !== EXCHANGE_IN_PROGRESS &&
+                    postDescription?.state !== EXCHANGE_COMPLETED
                       ? "Ver listado de solicitudes"
                       : "Ver estado del trueque"}
                   </button>
@@ -268,28 +235,6 @@ export const PostDescriptionScreen = () => {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      )}
-      {/* Modal */}
-      {isModalOpen && (
-        <div
-          id="modal-overlay"
-          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
-          onClick={handleModalClick}
-        >
-          <div className="relative w-11/12 md:w-2/3">
-            <Slider {...settings} initialSlide={selectedImageIndex}>
-              {postDescription?.images?.map((image, index) => (
-                <div key={index}>
-                  <img
-                    src={image}
-                    alt={`Foto ampliada ${index + 1}`}
-                    className="w-full h-[75vh] object-contain"
-                  />
-                </div>
-              ))}
-            </Slider>
           </div>
         </div>
       )}
