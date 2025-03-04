@@ -47,9 +47,13 @@ export const MyChatsScreen = () => {
         }
       });
 
-      socketRef.current.on("message", (received) => {
-        console.log("received:", received);
+      socketRef.current.on("message", async (received) => {
+        const auth = await loadFromLocalStorage("auth");
+        
         setConversationsList((prevChats) => {
+          if (received.to !== auth?.user_id) {
+            return prevChats;
+          }
           // Mapea y actualiza la lista
           const updatedChats = prevChats.map((chat) => {
             if (chat.chat_id === received.chatId) {
@@ -72,20 +76,22 @@ export const MyChatsScreen = () => {
           return [chatToMove, ...filteredChats];
         });
 
-        if (selectedChat) {
-          setSelectedChat((prevChat) => ({
-            ...prevChat,
-            lastMessage: received.message,
-            messages: [
-              ...prevChat.messages,
-              {
-                user_id: received.from,
-                content: received.message,
-                send_date: new Date(),
-              },
-            ],
-          }));
-        }
+          setSelectedChat((prevChat) => {
+            if (prevChat && prevChat.chat_id === received.chatId) {
+              return {
+                ...prevChat,
+                messages: [
+                  ...prevChat.messages,
+                  {
+                    user_id: received.from,
+                    content: received.message,
+                    send_date: new Date(),
+                  },
+                ],
+              };
+            }
+            return prevChat;
+          });
       });
     }
   };
@@ -99,12 +105,8 @@ export const MyChatsScreen = () => {
     setUser(auth);
     setLoading(true);
     try {
-      console.log('chat_id:', chat_id);
-      
       const data = await getChatsListClient(auth?.token, chat_id);
       validateSelectChat(data);
-
-      console.log("data:", data);
 
       if (data) {
         setConversationsList(data);
@@ -249,27 +251,27 @@ export const MyChatsScreen = () => {
                     key={index}
                     onClick={() => handleChatSelect(chat)}
                     className={`flex items-center p-4 border-b cursor-pointer overflow-y-hidden ${
-                      selectedChat?.chat_id === chat.chat_id
+                      selectedChat?.chat_id === chat?.chat_id
                         ? "bg-gray-200"
                         : "hover:bg-gray-50"
                     }`}
                   >
                     <img
-                      src={chat.profile_picture}
-                      alt={chat.name}
+                      src={chat?.profile_picture}
+                      alt={chat?.name}
                       className="w-10 h-10 rounded-full"
                     />
                     <div className="ml-3 flex-1 overflow-x-hidden ">
                       <div className="flex items-center justify-between">
-                        <h2 className="font-semibold text-black">{`${chat.name} ${chat.last_name}`}</h2>
+                        <h2 className="font-semibold text-black">{`${chat?.name} ${chat?.last_name}`}</h2>
                       </div>
-                      {chat.lastMessage ? (
+                      {chat?.lastMessage ? (
                         <p
                           className={
                             "text-gray-600 text-sm truncate w-full overflow-hidden whitespace-nowrap"
                           }
                         >
-                          {chat.lastMessage}
+                          {chat?.lastMessage}
                         </p>
                       ) : (
                         <div className="text-gray-200 text-sm">-</div>
@@ -302,12 +304,12 @@ export const MyChatsScreen = () => {
                     ←
                   </button>
                   <img
-                    src={selectedChat.profile_picture}
-                    alt={selectedChat.name}
+                    src={selectedChat?.profile_picture}
+                    alt={selectedChat?.name}
                     className="w-10 h-10 rounded-full"
                   />
                   <h2 className="ml-3 font-semibold text-black">
-                    {`${selectedChat.name} ${selectedChat.last_name}`}
+                    {`${selectedChat?.name} ${selectedChat?.last_name}`}
                   </h2>
                 </div>
 
@@ -320,28 +322,28 @@ export const MyChatsScreen = () => {
                       <div
                         key={index}
                         className={`flex ${
-                          message.user_id === user.user_id
+                          message?.user_id === user?.user_id
                             ? "justify-end"
                             : "justify-start"
                         }`}
                       >
                         <div
                           className={`max-w-[70%] w-auto inline-block rounded-lg px-4 py-2 ${
-                            message.user_id === user.user_id
+                            message?.user_id === user?.user_id
                               ? "bg-black text-white rounded-br-none"
                               : "bg-gray-200 text-black rounded-bl-none"
                           }`}
                         >
-                          <p className="break-words">{message.content}</p>
+                          <p className="break-words">{message?.content}</p>
                           <div className="flex justify-end">
                             <p
                               className={`text-xs mt-1 ${
-                                message.user_id === user.user_id
+                                message?.user_id === user?.user_id
                                   ? "text-gray-300"
                                   : "text-gray-500"
                               }`}
                             >
-                              {formatMessageHour(message.send_date)}
+                              {formatMessageHour(message?.send_date)}
                             </p>
                           </div>
                         </div>
