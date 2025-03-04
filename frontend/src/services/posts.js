@@ -11,9 +11,12 @@ export const getProvincesClient = async (token) => {
     .catch((error) => console.error(error));
 };
 
-export const getCategoriesClient = async (token) => {
+export const getCategoriesClient = async (token, bringAll) => {
   return await client
     .get("getCategories", {
+      params: {
+        bringAll,
+      },
       headers: {
         token,
       },

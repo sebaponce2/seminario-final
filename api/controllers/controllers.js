@@ -92,12 +92,13 @@ export async function getUserLogin(req, res) {
 // Crear una publicación
 export async function createPost(req, res) {
   try {
-    const { images, isService, video, ...filteredBody } = req.body;
+    const { images, isService, video, category_id, ...filteredBody } = req.body;
 
     const bodyProduct = {
       ...filteredBody,
       state: WAITING_FOR_APPROVAL,
       register_date: new Date(),
+      category_id: category_id ? category_id : 4,
     };
 
     const newProduct = await Product.create(bodyProduct);
@@ -142,8 +143,20 @@ export async function getProvinces(req, res) {
 }
 
 export async function getCategories(req, res) {
+  const { bringAll } = req.query;
+  
   try {
-    const categories = await Category.findAll();
+    let categories;
+    
+    if (bringAll === "true") {
+      categories = await Category.findAll();
+    } else {
+      categories = await Category.findAll({
+        where: {
+          name: { [Op.ne]: "Servicios" }
+        }
+      });
+    }
 
     res.status(200).json(categories);
   } catch (error) {

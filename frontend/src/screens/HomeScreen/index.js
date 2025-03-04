@@ -59,7 +59,7 @@ export const HomeScreen = () => {
 
   const getCategories = async () => {
     const { token } = loadFromLocalStorage("auth");
-    const data = await getCategoriesClient(token);
+    const data = await getCategoriesClient(token, true);
 
     if (data) {
       setCategories(data);

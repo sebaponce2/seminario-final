@@ -5,7 +5,11 @@ import {
   loadFromLocalStorage,
   saveToLocalStorage,
 } from "../../hooks/useLocaleStorage";
-import { createNewPost, getCategoriesClient, getProvincesClient } from "../../services/posts";
+import {
+  createNewPost,
+  getCategoriesClient,
+  getProvincesClient,
+} from "../../services/posts";
 import { SuccessPostModal } from "../../componentes/SuccessPostModal";
 
 export const CreatePostScreen = () => {
@@ -13,7 +17,7 @@ export const CreatePostScreen = () => {
     title: "",
     description: "",
     location_id: "",
-    category_id:"",
+    category_id: "",
     images: [],
   });
   const [provinces, setProvinces] = useState([]);
@@ -26,7 +30,7 @@ export const CreatePostScreen = () => {
   useEffect(() => {
     getProvinces();
     getCategories();
-  },[]);
+  }, []);
 
   const getProvinces = async () => {
     const { token } = loadFromLocalStorage("auth");
@@ -38,17 +42,17 @@ export const CreatePostScreen = () => {
   };
 
   const getCategories = async () => {
-      const { token } = loadFromLocalStorage("auth");
-      const data = await getCategoriesClient(token);
-  
-      if (data) {
-        setCategories(data);
-      }
+    const { token } = loadFromLocalStorage("auth");
+    const data = await getCategoriesClient(token, false);
+
+    if (data) {
+      setCategories(data);
     }
+  };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    
+
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
@@ -87,7 +91,8 @@ export const CreatePostScreen = () => {
     formData.title &&
     formData.description &&
     formData.location_id &&
-    formData.category_id &&
+    ((!isService && formData.category_id) ||
+      (isService && !formData.category_id)) &&
     formData.images.length > 0;
 
   const handleSubmit = async () => {
@@ -209,28 +214,32 @@ export const CreatePostScreen = () => {
             {formData.description.length}/250 caracteres
           </p>
         </div>
-        <div className="mb-6">
-          <label
-            className="block mb-2 text-sm font-medium text-black"
-            htmlFor="provincia"
-          >
-            Categoría
-          </label>
-          <select
-            id="category_id"
-            value={formData.category_id}
-            onChange={handleInputChange}
-            className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            required
-          >
-            <option key="" value="">Selecciona una categoría</option>
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id}>
-                {category.name}
+        {!isService && (
+          <div className="mb-6">
+            <label
+              className="block mb-2 text-sm font-medium text-black"
+              htmlFor="provincia"
+            >
+              Categoría
+            </label>
+            <select
+              id="category_id"
+              value={formData.category_id}
+              onChange={handleInputChange}
+              className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              required
+            >
+              <option key="" value="">
+                Selecciona una categoría
               </option>
-            ))}
-          </select>
-        </div>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="mb-6">
           <label
             className="block mb-2 text-sm font-medium text-black"
@@ -245,7 +254,9 @@ export const CreatePostScreen = () => {
             className="bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             required
           >
-            <option key="" value="">Selecciona una provincia</option>
+            <option key="" value="">
+              Selecciona una provincia
+            </option>
             {provinces.map((prov) => (
               <option key={prov.location_id} value={prov.location_id}>
                 {prov.name}
