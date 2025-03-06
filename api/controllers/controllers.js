@@ -1031,18 +1031,19 @@ export const getChatsList = async (req, res) => {
       })
     );
 
-    // Si hay un nuevo chat, agregarlo al principio del array
-    if (newChat) {
-      response.unshift(newChat);
-    }
-
+    
     // Ordenar la lista por fecha del último mensaje (nuevo chat sin mensajes permanece al principio)
     response.sort((a, b) => {
       if (!a.lastMessageDate) return -1; // Mantener nuevo chat sin mensajes primero
       if (!b.lastMessageDate) return 1;
       return new Date(b.lastMessageDate) - new Date(a.lastMessageDate);
     });
-
+    
+    // Si hay un nuevo chat, agregarlo al principio del array
+    if (newChat) {
+      response.unshift(newChat);
+    }
+    
     res.status(200).json(response);
   } catch (error) {
     console.log("error:", error);
