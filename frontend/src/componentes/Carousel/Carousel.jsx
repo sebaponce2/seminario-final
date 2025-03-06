@@ -57,7 +57,7 @@ export default function ImageCarousel({ images = [] }) {
         <CarouselContent>
           {carouselImages.map((image, index) => (
             <CarouselItem key={index}>
-              <div className="p-1">
+              <div>
                 <img
                   src={image || "/placeholder.svg"}
                   alt={`Slide ${index + 1}`}

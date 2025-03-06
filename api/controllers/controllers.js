@@ -940,7 +940,7 @@ export const getChatsList = async (req, res) => {
   const { uid } = user;
 
   const { chat_id: clientChatId } = req.query; // Obtener el parámetro `chat_id` del cliente
-
+  
   try {
     const findUser = await Users.findOne({ where: { uid } });
     const user = findUser.dataValues;
@@ -955,9 +955,9 @@ export const getChatsList = async (req, res) => {
       },
       include: [
         {
-          model: Message, // Relación directa con Message
-          required: true, // Asegura que el `JOIN` sea INNER JOIN
-          attributes: [], // No traer columnas de Message, solo validar la existencia
+          model: Message,
+          required: true,
+          attributes: [],
         },
       ],
     });
@@ -965,14 +965,10 @@ export const getChatsList = async (req, res) => {
     // Si se proporciona un chat_id desde el cliente
     let newChat = null;
     if (clientChatId) {
-      
       const existingChat = await Chat.findOne({
         where: { chat_id: clientChatId },
       });
 
-      console.log('existingChat:', existingChat);
-      
-      
       if (existingChat) {
         const userToChat =
           user.user_id === existingChat.first_user_id
@@ -986,15 +982,21 @@ export const getChatsList = async (req, res) => {
           where: { user_id: userToChat },
         });
 
-        newChat = {
-          chat_id: existingChat.chat_id,
-          user_id: userChat.dataValues.user_id,
-          name: userChat.dataValues.name,
-          last_name: userChat.dataValues.last_name,
-          profile_picture: multimedia?.dataValues.value || null,
-          lastMessage: null,
-          lastMessageDate: null, // No hay mensajes, no hay fecha
-        };
+        const chatHasMessages = await Message.findAll({
+          where: { chat_id: existingChat.chat_id },
+        });
+
+        if (chatHasMessages.length <= 0) {
+          newChat = {
+            chat_id: existingChat.chat_id,
+            user_id: userChat.dataValues.user_id,
+            name: userChat.dataValues.name,
+            last_name: userChat.dataValues.last_name,
+            profile_picture: multimedia?.dataValues.value || null,
+            lastMessage: null,
+            lastMessageDate: null,
+          };
+        }
       }
     }
 
@@ -1028,10 +1030,6 @@ export const getChatsList = async (req, res) => {
         };
       })
     );
-
-    console.log('response:', response);
-    console.log('chats:', chats);
-    
 
     // Si hay un nuevo chat, agregarlo al principio del array
     if (newChat) {
@@ -1067,25 +1065,20 @@ export const validateChat = async (req, res) => {
     });
 
     if (chat) {
-      console.log('chat:', chat);
-      
       return res.status(200).json(chat.dataValues);
     } else {
-      const request = {
-        body: {
-          first_user_id,
-          second_user_id,
-        },
-      };
-      const response = await createNewChat(request, res);
-      return res.status(201).json(response);
+      await createNewChat({ body: { first_user_id, second_user_id } }, res);
+      return; 
     }
   } catch (error) {
-    console.log("error:", error);
-
-    res.status(500).json({ message: "Error al validar el chat", error });
+    console.log("Error:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Error al validar el chat", error });
+    }
   }
 };
+
+
 
 export const getChatMessages = async (req, res) => {
   const { chat_id } = req.query;
