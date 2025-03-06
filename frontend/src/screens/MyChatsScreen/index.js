@@ -9,6 +9,7 @@ import { loadFromLocalStorage } from "../../hooks/useLocaleStorage";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import Loader from "react-js-loader";
+import "./chat.css";
 
 export const MyChatsScreen = () => {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -49,7 +50,7 @@ export const MyChatsScreen = () => {
 
       socketRef.current.on("message", async (received) => {
         const auth = await loadFromLocalStorage("auth");
-        
+
         setConversationsList((prevChats) => {
           if (received.to !== auth?.user_id) {
             return prevChats;
@@ -76,22 +77,22 @@ export const MyChatsScreen = () => {
           return [chatToMove, ...filteredChats];
         });
 
-          setSelectedChat((prevChat) => {
-            if (prevChat && prevChat.chat_id === received.chatId) {
-              return {
-                ...prevChat,
-                messages: [
-                  ...prevChat.messages,
-                  {
-                    user_id: received.from,
-                    content: received.message,
-                    send_date: new Date(),
-                  },
-                ],
-              };
-            }
-            return prevChat;
-          });
+        setSelectedChat((prevChat) => {
+          if (prevChat && prevChat.chat_id === received.chatId) {
+            return {
+              ...prevChat,
+              messages: [
+                ...prevChat.messages,
+                {
+                  user_id: received.from,
+                  content: received.message,
+                  send_date: new Date(),
+                },
+              ],
+            };
+          }
+          return prevChat;
+        });
       });
     }
   };
@@ -322,8 +323,7 @@ export const MyChatsScreen = () => {
                 </div>
 
                 <div
-                  style={{ maxWidth: "75vw" }}
-                  className="flex-1 overflow-y-auto p-4 space-y-4"
+                  className="chat-size flex-1 overflow-y-auto p-4 space-y-4"
                 >
                   {selectedChat && selectedChat?.messages?.length > 0 ? (
                     selectedChat?.messages.map((message, index) => (
