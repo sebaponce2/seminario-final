@@ -188,7 +188,15 @@ export const MyChatsScreen = () => {
         return chat;
       });
 
-      return updatedChats;
+      // Encuentra el chat actualizado y muévelo al inicio
+      const chatToMove = updatedChats.find(
+        (chat) => chat.chat_id === selectedChat.chat_id
+      );
+      const filteredChats = updatedChats.filter(
+        (chat) => chat.chat_id !== selectedChat.chat_id
+      );
+
+      return [chatToMove, ...filteredChats];
     });
   };
 
