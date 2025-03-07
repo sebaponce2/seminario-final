@@ -3,6 +3,7 @@ import { register } from "../../plugins/providers";
 import { createNewUser } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { encryptPassword } from "../../utils/encrypt";
+import { Input } from "./Input";
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -145,41 +146,6 @@ export const RegisterForm = () => {
     }
   };
 
-  const renderInput = (
-    name,
-    label,
-    type = "text",
-    placeholder,
-    isOptional = false
-  ) => (
-    <div>
-      <label htmlFor={name} className="block text-sm font-medium text-black">
-        {label}{" "}
-        {isOptional && <span className="text-gray-500">(Opcional)</span>}
-      </label>
-      <input
-        type={type}
-        id={name}
-        name={name}
-        value={formData[name]}
-        onChange={handleChange}
-        placeholder={placeholder}
-        className={`mt-1 block w-full px-3 py-2 bg-white border ${
-          errors[name] ? "border-red-500" : "border-gray-300"
-        } rounded-md text-sm shadow-sm placeholder-gray-400
-                       focus:outline-none focus:border-black focus:ring-1 focus:ring-black`}
-        required={!isOptional}
-        aria-invalid={errors[name] ? "true" : "false"}
-        aria-describedby={errors[name] ? `${name}-error` : undefined}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-xs text-red-500" id={`${name}-error`}>
-          {errors[name]}
-        </p>
-      )}
-    </div>
-  );
-
   return (
     <div>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -213,27 +179,60 @@ export const RegisterForm = () => {
             </div>
           )}
         </div>
-        {renderInput("name", "Nombre", "text", "Escriba su nombre")}
-        {renderInput("last_name", "Apellido", "text", "Escriba su apellido")}
-        {renderInput("age", "Edad", "number", "Indique su edad")}
-        {renderInput(
-          "email",
-          "Email",
-          "email",
-          "Escriba su correo electrónico"
-        )}
-        {renderInput(
-          "password",
-          "Contraseña",
-          "password",
-          "Escriba su contraseña"
-        )}
-        {renderInput(
-          "phone",
-          "Teléfono",
-          "tel",
-          "Indique su número de teléfono"
-        )}
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"name"}
+          label={"Nombre"}
+          type="text"
+          placeholder={"Escriba su nombre"}
+        />
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"last_name"}
+          label={"Apellido"}
+          type="text"
+          placeholder={"Escriba su apellido"}
+        />
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"age"}
+          label={"Edad"}
+          type="number"
+          placeholder={"Indique su edad"}
+        />
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"email"}
+          label={"Email"}
+          type="email"
+          placeholder={"Escriba su correo electrónico"}
+        />
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"password"}
+          label={"Contraseña"}
+          type="password"
+          placeholder={"Escriba su contraseña"}
+        />
+        <Input
+          formData={formData}
+          handleChange={handleChange}
+          errors={errors}
+          name={"phone"}
+          label={"Teléfono"}
+          type="tel"
+          placeholder={"Indique su número de teléfono"}
+        />
         <button
           type="submit"
           disabled={!isFormValid || serviceRunning}
