@@ -1,3 +1,5 @@
+import { EXCHANGE_IN_PROGRESS, PENDING_APPROVAL, REJECTED } from "./enums";
+
 export const labels = {
   APPROVED: "Disponible",
   REJECTED: "No aprobado",
@@ -13,3 +15,18 @@ export const classStatus = {
   WAITING_FOR_APPROVAL: "bg-yellow-100 text-yellow-800",
   EXCHANGE_IN_PROGRESS: "bg-yellow-100 text-yellow-800",
 };
+
+export const statusOptions = [
+  {
+    text: "Pendiente",
+    status: PENDING_APPROVAL,
+  },
+  {
+    text: "Confirmado",
+    status: EXCHANGE_IN_PROGRESS,
+  },
+  {
+    text: "Rechazado",
+    status: REJECTED,
+  },
+]
