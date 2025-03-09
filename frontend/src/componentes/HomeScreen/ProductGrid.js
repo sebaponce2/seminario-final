@@ -7,7 +7,7 @@ const ProductGrid = ({ posts, navigate }) => {
         <article
           onClick={() => navigate("/detailsPost", { state: post.product_id })}
           key={index}
-          className="bg-white rounded-lg overflow-hidden border-2 border-gray-100 bg-black cursor-pointer"
+          className="bg-white rounded-lg overflow-hidden border-2 border-gray-100 cursor-pointer"
         >
           <img src={post?.images[0]} alt={post.title} className="w-full h-64 object-cover" />
           <div className="p-4">
