@@ -1,29 +1,35 @@
 import { Router } from "express";
 import {
-  cancelExchangeRequest,
-  confirmExchange,
-  createNewMessage,
-  createPost,
-  createRequestExchange,
   createUser,
+  getProfileDetails,
+  getUserLogin,
+} from "../controllers/userController.js";
+import {
+  createPost,
   getCategories,
-  getChatMessages,
-  getChatsList,
-  getExchangeDetails,
-  getExchangesHistory,
   getMyPosts,
   getPostDescription,
-  getPostRequestsList,
   getPostsAdmin,
   getPostsClient,
-  getPostsToExchange,
-  getProfileDetails,
   getProvinces,
-  getUserLogin,
-  updateExchangeRequestStatus,
   updatePostStatus,
+} from "../controllers/productController.js";
+import {
+  cancelExchangeRequest,
+  confirmExchange,
+  createRequestExchange,
+  getExchangeDetails,
+  getExchangesHistory,
+  getPostRequestsList,
+  getPostsToExchange,
+  updateExchangeRequestStatus,
+} from "../controllers/exchangeController.js";
+import {
+  createNewMessage,
+  getChatMessages,
+  getChatsList,
   validateChat,
-} from "../controllers/controllers.js";
+} from "../controllers/chatController.js";
 
 const router = Router();
 
