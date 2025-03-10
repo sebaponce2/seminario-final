@@ -1,5 +1,4 @@
-"use client";
-
+import { useEffect, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
@@ -13,6 +12,21 @@ const ChatView = ({
   setShowChatOnMobile,
   showChatOnMobile,
 }) => {
+  const [focusTrigger, setFocusTrigger] = useState(0);
+
+  useEffect(() => {
+    if (selectedChat) {
+      setFocusTrigger((prev) => prev + 1);
+    }
+  }, [selectedChat]);
+
+  const handleSubmit = (e) => {
+    handleSendMessage(e);
+    setTimeout(() => {
+      setFocusTrigger((prev) => prev + 1);
+    }, 0);
+  };
+
   return (
     <div
       style={{ maxWidth: "100vw" }}
@@ -37,12 +51,12 @@ const ChatView = ({
           <ChatInput
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onSubmit={handleSendMessage}
+            onSubmit={handleSubmit}
+            shouldFocus={focusTrigger}
           />
         </>
       )}
     </div>
   );
 };
-
 export default ChatView;

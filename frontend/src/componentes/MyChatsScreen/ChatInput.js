@@ -3,12 +3,12 @@
 import { useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 
-const ChatInput = ({ value, onChange, onSubmit }) => {
+const ChatInput = ({ value, onChange, onSubmit, shouldFocus }) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {
     textareaRef.current?.focus();
-  }, []);
+  }, [shouldFocus]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
