@@ -63,7 +63,7 @@ export const Navbar = () => {
         )}
       </div>
 
-      {/* User Mobile Menu Menu */}
+      {/* User Mobile Menu */}
       {isOpen && <UserMobileMenu user={user} onClose={() => setIsOpen(false)} />}
     </nav>
   );
