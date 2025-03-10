@@ -50,7 +50,7 @@ export const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="focus:outline-none"
+              className="focus:outline-none items-center flex"
               aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
             >
               {isOpen ? (
