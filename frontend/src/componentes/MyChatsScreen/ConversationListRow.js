@@ -1,5 +1,3 @@
-"use client";
-
 const ConversationListRow = ({ chat, isSelected, onClick }) => {
   return (
     <div

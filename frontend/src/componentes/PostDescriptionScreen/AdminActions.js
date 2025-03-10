@@ -1,5 +1,3 @@
-"use client";
-
 import VideoSection from "./VideoSection";
 
 const AdminActions = ({

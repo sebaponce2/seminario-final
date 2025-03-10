@@ -1,4 +1,3 @@
-"use client";
 import {
   EXCHANGE_COMPLETED,
   EXCHANGE_IN_PROGRESS,

@@ -1,5 +1,3 @@
-"use client";
-
 import ConversationListRow from "./ConversationListRow";
 
 const ConversationList = ({

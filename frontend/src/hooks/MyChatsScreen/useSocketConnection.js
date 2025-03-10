@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, useEffect } from "react";
 import { io } from "socket.io-client";
 import { loadFromLocalStorage } from "../useLocaleStorage";

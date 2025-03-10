@@ -1,5 +1,3 @@
-"use client";
-
 const VideoSection = ({ video, isVideoVisible, handleVideoClick }) => {
   return (
     <div className="sm:flex-row gap-4">
