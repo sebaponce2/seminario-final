@@ -11,7 +11,7 @@ export const useSocketConnection = (
 
   const initializeSocket = () => {
     if (!socketRef.current) {
-      socketRef.current = io("http://localhost:8080");
+      socketRef.current = io(process.env.REACT_APP_API_URL);
 
       socketRef.current.on("connect", () => {
         console.log("Connected to socket server with id", socketRef.current.id);

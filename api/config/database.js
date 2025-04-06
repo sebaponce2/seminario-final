@@ -1,13 +1,19 @@
 import 'dotenv/config'; 
 import { Sequelize } from 'sequelize';
 
-export const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
+export const sequelize = new Sequelize(process.env.DB_URL, {
   dialect: 'postgres',
+  protocol: 'postgres',
   logging: false, // Para desactivar el log de SQL queries
   define: {
     freezeTableName: true, // Evita que Sequelize pluralice los nombres de las tablas
   },
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
 });
 
 export const connectDB = async () => {
