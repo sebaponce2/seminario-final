@@ -54,7 +54,7 @@ const UserMobileMenu = ({ user, onClose }) => {
             </div>
           )}
 
-          <div >
+          <div>
             <div className="flex items-center space-x-2 mb-3">
               <img
                 src={
@@ -70,6 +70,13 @@ const UserMobileMenu = ({ user, onClose }) => {
             <div className="flex flex-col space-y-3 pl-2">
               <Link to="/profile" onClick={onClose} className="py-2">
                 Mi perfil
+              </Link>
+              <Link
+                to="/chats"
+                onClick={() => setIsDropdownOpen(false)}
+                className="block px-4 py-2 hover:bg-gray-100"
+              >
+                Chats
               </Link>
               <Link to="/myPosts" onClick={onClose} className="py-2">
                 Mis publicaciones

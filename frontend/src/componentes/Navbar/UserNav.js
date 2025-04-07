@@ -95,6 +95,13 @@ const UserNav = ({ user }) => {
               Mi perfil
             </Link>
             <Link
+              to="/chats"
+              onClick={() => setIsDropdownOpen(false)}
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              Chats
+            </Link>
+            <Link
               to="/myPosts"
               onClick={() => setIsDropdownOpen(false)}
               className="block px-4 py-2 hover:bg-gray-100"
